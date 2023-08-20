@@ -1,0 +1,81 @@
+swagger: "2.0"
+info:
+  title: api/tasks/v1/tasks.proto
+  version: version not set
+tags:
+  - name: TasksService
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /v1/{parent}/tasks:
+    post:
+      operationId: TasksService_CreateTask
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1Task'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: parent
+          description: |-
+            The parent resource where this task will be created.
+            Format: projects/{project}
+          in: path
+          required: true
+          type: string
+          pattern: projects/[^/]+
+        - name: task
+          description: The task to create.
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1Task'
+            required:
+              - task
+        - name: taskId
+          description: |-
+            The ID to use for the task, which will become the final component of
+            the task's resource name.
+
+            This value should be 4-63 characters, and valid characters
+            are /[a-z][0-9]-/.
+          in: query
+          required: false
+          type: string
+      tags:
+        - TasksService
+definitions:
+  protobufAny:
+    type: object
+    properties:
+      '@type':
+        type: string
+    additionalProperties: {}
+  rpcStatus:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      details:
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/protobufAny'
+  v1Task:
+    type: object
+    properties:
+      id:
+        type: string
+      title:
+        type: string
+      description:
+        type: string

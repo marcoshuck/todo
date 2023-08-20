@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package api.tasks.v1;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/api/client.proto";
+
+message Task {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+}
+
+message CreateTaskRequest {
+  // The parent resource where this task will be created.
+  // Format: projects/{project}
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "todo.huck.com.ar/Task"
+    }];
+
+  // The ID to use for the task, which will become the final component of
+  // the task's resource name.
+  //
+  // This value should be 4-63 characters, and valid characters
+  // are /[a-z][0-9]-/.
+  string task_id = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // The task to create.
+  Task task = 3 [(google.api.field_behavior) = REQUIRED];
+}
+
+service TasksService {
+  rpc CreateTask(CreateTaskRequest) returns (Task) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*}/tasks";
+      body: "task";
+    };
+    option (google.api.method_signature) = "parent,task";
+  }
+}
