@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	TasksService_CreateTask_FullMethodName = "/tasks.v1.TasksService/CreateTask"
+	TasksService_CreateTask_FullMethodName = "/api.tasks.v1.TasksService/CreateTask"
 )
 
 // TasksServiceClient is the client API for TasksService service.
@@ -96,7 +96,7 @@ func _TasksService_CreateTask_Handler(srv interface{}, ctx context.Context, dec 
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var TasksService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "tasks.v1.TasksService",
+	ServiceName: "api.tasks.v1.TasksService",
 	HandlerType: (*TasksServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

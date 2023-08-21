@@ -16,11 +16,7 @@ message Task {
 message CreateTaskRequest {
   // The parent resource where this task will be created.
   // Format: projects/{project}
-  string parent = 1 [
-    (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = {
-      child_type: "todo.huck.com.ar/Task"
-    }];
+  reserved 1;
 
   // The ID to use for the task, which will become the final component of
   // the task's resource name.
@@ -36,9 +32,9 @@ message CreateTaskRequest {
 service TasksService {
   rpc CreateTask(CreateTaskRequest) returns (Task) {
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*}/tasks";
+      post: "/v1/tasks";
       body: "task";
     };
-    option (google.api.method_signature) = "parent,task";
+    option (google.api.method_signature) = "task";
   }
 }

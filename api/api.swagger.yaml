@@ -9,7 +9,7 @@ consumes:
 produces:
   - application/json
 paths:
-  /v1/{parent}/tasks:
+  /v1/tasks:
     post:
       operationId: TasksService_CreateTask
       responses:
@@ -22,14 +22,6 @@ paths:
           schema:
             $ref: '#/definitions/rpcStatus'
       parameters:
-        - name: parent
-          description: |-
-            The parent resource where this task will be created.
-            Format: projects/{project}
-          in: path
-          required: true
-          type: string
-          pattern: projects/[^/]+
         - name: task
           description: The task to create.
           in: body
