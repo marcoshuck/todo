@@ -11,6 +11,7 @@ produces:
 paths:
   /v1/tasks:
     post:
+      summary: CreateTask creates a Task.
       operationId: TasksService_CreateTask
       responses:
         "200":
@@ -23,23 +24,13 @@ paths:
             $ref: '#/definitions/rpcStatus'
       parameters:
         - name: task
-          description: The task to create.
+          description: Task is the the task to create.
           in: body
           required: true
           schema:
             $ref: '#/definitions/v1Task'
             required:
               - task
-        - name: taskId
-          description: |-
-            The ID to use for the task, which will become the final component of
-            the task's resource name.
-
-            This value should be 4-63 characters, and valid characters
-            are /[a-z][0-9]-/.
-          in: query
-          required: false
-          type: string
       tags:
         - TasksService
 definitions:
@@ -67,7 +58,20 @@ definitions:
     properties:
       id:
         type: string
+        format: int64
       title:
         type: string
       description:
         type: string
+      deadline:
+        type: string
+        format: date-time
+      completedAt:
+        type: string
+        format: date-time
+      createTime:
+        type: string
+        format: date-time
+      updateTime:
+        type: string
+        format: date-time

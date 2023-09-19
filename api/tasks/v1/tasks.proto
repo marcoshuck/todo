@@ -6,11 +6,24 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/api/client.proto";
+import "google/protobuf/timestamp.proto";
 
 message Task {
-  string id = 1;
+  option (google.api.resource) = {
+    type: "todo.huck.com.ar/Task"
+    pattern: "tasks/{task}"
+    singular: "task"
+    plural: "tasks"
+  };
+
+  int64 id = 1;
   string title = 2;
   string description = 3;
+  google.protobuf.Timestamp deadline = 4;
+  google.protobuf.Timestamp completed_at = 5;
+
+  google.protobuf.Timestamp create_time = 1000;
+  google.protobuf.Timestamp update_time = 1001;
 }
 
 message CreateTaskRequest {
@@ -18,23 +31,18 @@ message CreateTaskRequest {
   // Format: projects/{project}
   reserved 1;
 
-  // The ID to use for the task, which will become the final component of
-  // the task's resource name.
-  //
-  // This value should be 4-63 characters, and valid characters
-  // are /[a-z][0-9]-/.
-  string task_id = 2 [(google.api.field_behavior) = OPTIONAL];
-
-  // The task to create.
-  Task task = 3 [(google.api.field_behavior) = REQUIRED];
+  // Task is the the task to create.
+  Task task = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
+// TasksService holds the methods to persist, retrieve, modify and remove Tasks.
 service TasksService {
+  // CreateTask creates a Task.
   rpc CreateTask(CreateTaskRequest) returns (Task) {
     option (google.api.http) = {
       post: "/v1/tasks";
       body: "task";
     };
     option (google.api.method_signature) = "task";
-  }
+  };
 }
