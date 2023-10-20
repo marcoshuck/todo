@@ -1,0 +1,77 @@
+swagger: "2.0"
+info:
+  title: api/tasks/v1/tasks.proto
+  version: version not set
+tags:
+  - name: TasksService
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /v1/tasks:
+    post:
+      summary: CreateTask creates a Task.
+      operationId: TasksService_CreateTask
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1Task'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: task
+          description: Task is the the task to create.
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1Task'
+            required:
+              - task
+      tags:
+        - TasksService
+definitions:
+  protobufAny:
+    type: object
+    properties:
+      '@type':
+        type: string
+    additionalProperties: {}
+  rpcStatus:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      details:
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/protobufAny'
+  v1Task:
+    type: object
+    properties:
+      id:
+        type: string
+        format: int64
+      title:
+        type: string
+      description:
+        type: string
+      deadline:
+        type: string
+        format: date-time
+      completedAt:
+        type: string
+        format: date-time
+      createTime:
+        type: string
+        format: date-time
+      updateTime:
+        type: string
+        format: date-time
