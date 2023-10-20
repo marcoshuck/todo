@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config
+  labels:
+    app.kubernetes.io/name: todo
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/version: v1
+data:
+  # Application configuration
+  ENVIRONMENT: "production"
+  APPLICATION_NAME: "todo"
+  APPLICATION_PORT: "3030"
+
+  # Database configuration
+  DATABASE_ENGINE: "mysql"
+  DATABASE_HOST: "localhost"
+  DATABASE_USER: "user"
+  DATABASE_PASSWORD: "changeme"
+  DATABASE_PORT: "3306"
+  DATABASE_CHARSET: "utf8mb4"
