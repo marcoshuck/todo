@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo
+  labels:
+    app.kubernetes.io/name: todo
+    app.kubernetes.io/component	: backend
+    app.kubernetes.io/version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo
+  template:
+    metadata:
+      labels:
+        app: todo
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/marcoshuck/todo/app:latest
+          ports:
+            - containerPort: 3030
+          envFrom:
+            - configMapRef:
+                name: config
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+
+        - name: gateway
+          image: ghcr.io/marcoshuck/todo/gateway:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: HOST
+              value: "localhost"
+            - name: PORT
+              value: "3030"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
