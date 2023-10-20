@@ -2,18 +2,23 @@ package domain
 
 import (
 	"encoding/json"
-	"errors"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
+	"github.com/marcoshuck/todo/pkg/serializer"
+	"github.com/marcoshuck/todo/pkg/validator"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gopkg.in/yaml.v3"
 	"gorm.io/gorm"
 	"time"
 )
 
+var _ serializer.JsonSerializer = (*Task)(nil)
+var _ serializer.YamlSerializer = (*Task)(nil)
+var _ serializer.ApiSerializer[*tasksv1.Task] = (*Task)(nil)
+
 // Task defines the scope of an action a User implements in their tasks dashboard.
 type Task struct {
 	gorm.Model
-	Title       string
+	Title       string `validate:"required,min=3"`
 	Description string
 	Deadline    *time.Time
 	CompletedAt *time.Time
@@ -68,8 +73,5 @@ func (t *Task) fromAPI(in *tasksv1.Task) *Task {
 
 // validate validates the current Task
 func (t *Task) validate() error {
-	if len(t.Title) < 3 {
-		return errors.New("task title should have at least 3 characters")
-	}
-	return nil
+	return validator.Validator.Struct(t)
 }

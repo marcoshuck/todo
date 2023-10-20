@@ -29,6 +29,7 @@ message Task {
 message CreateTaskRequest {
   // The parent resource where this task will be created.
   // Format: projects/{project}
+  reserved "parent";
   reserved 1;
 
   // Task is the the task to create.

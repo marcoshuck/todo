@@ -2,7 +2,6 @@ package server
 
 import (
 	"github.com/gojaguar/jaguar/database"
-	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
 	"github.com/marcoshuck/todo/pkg/service"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -10,30 +9,7 @@ import (
 	"net"
 )
 
-func Run(app Application) error {
-	app.logger.Debug("Listening...", zap.String("address", app.listener.Addr().String()))
-	if err := app.Serve(); err != nil {
-		return err
-	}
-	return nil
-}
-
-type Services struct {
-	Tasks tasksv1.TasksServiceServer
-}
-
-type Application struct {
-	server   *grpc.Server
-	listener net.Listener
-	logger   *zap.Logger
-	db       *gorm.DB
-	services Services
-}
-
-func (app Application) Serve() error {
-	return app.server.Serve(app.listener)
-}
-
+// Setup creates a new application using the given Config.
 func Setup(cfg Config) (Application, error) {
 	logger, err := setupLogger(cfg)
 	if err != nil {
@@ -67,23 +43,39 @@ func Setup(cfg Config) (Application, error) {
 	}, nil
 }
 
+// setupServices initializes the Application Services.
 func setupServices(db *gorm.DB, logger *zap.Logger) Services {
+	logger.Debug("Initializing services")
 	tasksService := service.NewTasks(db, logger)
 	return Services{
 		Tasks: tasksService,
 	}
 }
 
+// setupListener initializes a new tcp listener used by a gRPC server.
 func setupListener(cfg Config, logger *zap.Logger) (net.Listener, error) {
 	protocol, address := cfg.Listener()
 	logger.Debug("Initializing listener", zap.String("listener.protocol", protocol), zap.String("listener.address", address))
 	l, err := net.Listen(protocol, address)
 	if err != nil {
+		logger.Error("Failed to initialize listener", zap.Error(err))
 		return nil, err
 	}
 	return l, nil
 }
 
+// setupDB initializes a new connection with a DB server.
+func setupDB(cfg Config, logger *zap.Logger) (*gorm.DB, error) {
+	logger.Debug("Initializing DB connection", zap.String("db.engine", cfg.DB.Engine), zap.String("db.dsn", cfg.DB.DSN()))
+	db, err := database.SetupConnectionSQL(cfg.DB)
+	if err != nil {
+		logger.Error("Failed to initialize DB connection", zap.Error(err))
+		return nil, err
+	}
+	return db, nil
+}
+
+// setupLogger initializes a new Zap Logger with the parameters specified by the given Config.
 func setupLogger(cfg Config) (*zap.Logger, error) {
 	var logger *zap.Logger
 	var err error
@@ -100,14 +92,4 @@ func setupLogger(cfg Config) (*zap.Logger, error) {
 	}
 	logger = logger.Named(cfg.Name)
 	return logger, nil
-}
-
-func setupDB(cfg Config, logger *zap.Logger) (*gorm.DB, error) {
-	logger.Debug("Initializing DB connection", zap.String("db.engine", cfg.DB.Engine), zap.String("db.dsn", cfg.DB.ToDNS()))
-	db, err := database.SetupConnectionSQL(cfg.DB)
-	if err != nil {
-		logger.Error("Failed to initialize DB connection", zap.Error(err))
-		return nil, err
-	}
-	return db, nil
 }
