@@ -1,0 +1,52 @@
+name: Format
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+    tags:
+      - v*
+
+jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+
+      - name: fmt
+        run: make fmt
+
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      GOPRIVATE: ${{ inputs.go-private }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          cache: true
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+          args: --timeout=3m
+
+  vet:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+
+      - name: vet
+        run: make vet
