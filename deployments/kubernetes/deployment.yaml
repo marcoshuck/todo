@@ -43,7 +43,7 @@ spec:
             - name: HOST
               value: "localhost"
             - name: PORT
-              value: "3030"
+              value: "8080"
           securityContext:
             allowPrivilegeEscalation: false
             runAsNonRoot: true
