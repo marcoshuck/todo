@@ -31,7 +31,7 @@ func (suite *TasksServiceTestSuite) SetupTest() {
 	suite.Require().NoError(err)
 	suite.Require().NoError(suite.db.Migrator().AutoMigrate(&domain.Task{}))
 
-	suite.svc = NewTasks(suite.db, zap.NewNop())
+	suite.svc = NewTasks(suite.db, zap.NewNop(), nil)
 }
 
 func (suite *TasksServiceTestSuite) TearDownTest() {

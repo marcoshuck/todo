@@ -3,6 +3,9 @@ package server
 import (
 	"github.com/gojaguar/jaguar/database"
 	"github.com/marcoshuck/todo/pkg/service"
+	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/metric/noop"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
@@ -12,6 +15,16 @@ import (
 // Setup creates a new application using the given Config.
 func Setup(cfg Config) (Application, error) {
 	logger, err := setupLogger(cfg)
+	if err != nil {
+		return Application{}, err
+	}
+
+	tracerProvider, err := setupTracerProvider(cfg)
+	if err != nil {
+		return Application{}, err
+	}
+
+	meterProvider, err := setupMeterProvider(cfg)
 	if err != nil {
 		return Application{}, err
 	}
@@ -28,25 +41,27 @@ func Setup(cfg Config) (Application, error) {
 		return Application{}, err
 	}
 
-	svc := setupServices(db, logger)
+	svc := setupServices(db, logger, tracerProvider, meterProvider)
 
 	var opts []grpc.ServerOption
 
 	srv := grpc.NewServer(opts...)
 
 	return Application{
-		server:   srv,
-		listener: l,
-		logger:   logger,
-		db:       db,
-		services: svc,
+		server:         srv,
+		listener:       l,
+		logger:         logger,
+		tracerProvider: tracerProvider,
+		meterProvider:  meterProvider,
+		db:             db,
+		services:       svc,
 	}, nil
 }
 
 // setupServices initializes the Application Services.
-func setupServices(db *gorm.DB, logger *zap.Logger) Services {
+func setupServices(db *gorm.DB, logger *zap.Logger, tracerProvider trace.TracerProvider, meterProvider metric.MeterProvider) Services {
 	logger.Debug("Initializing services")
-	tasksService := service.NewTasks(db, logger)
+	tasksService := service.NewTasks(db, logger, tracerProvider.Tracer("todo.huck.com.ar/tasks"))
 	return Services{
 		Tasks: tasksService,
 	}
@@ -92,4 +107,22 @@ func setupLogger(cfg Config) (*zap.Logger, error) {
 	}
 	logger = logger.Named(cfg.Name)
 	return logger, nil
+}
+
+func setupTracerProvider(cfg Config) (trace.TracerProvider, error) {
+	var tracerProvider trace.TracerProvider
+	switch cfg.Environment {
+	default:
+		tracerProvider = trace.NewNoopTracerProvider()
+	}
+	return tracerProvider, nil
+}
+
+func setupMeterProvider(cfg Config) (metric.MeterProvider, error) {
+	var meterProvider metric.MeterProvider
+	switch cfg.Environment {
+	default:
+		meterProvider = noop.NewMeterProvider()
+	}
+	return meterProvider, nil
 }
