@@ -2,9 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: todo
+  namespace: todo
   labels:
     app.kubernetes.io/name: todo
-    app.kubernetes.io/component	: backend
+    app.kubernetes.io/component: backend
     app.kubernetes.io/version: v1
 spec:
   replicas: 1
