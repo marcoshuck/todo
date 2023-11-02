@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"github.com/gojaguar/jaguar/database"
 	grpc_logging "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
@@ -10,14 +11,22 @@ import (
 	"github.com/uptrace/opentelemetry-go-extra/otelgorm"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/noop"
+	metric_sdk "go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/resource"
+	trace_sdk "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
+	"io"
 	"net"
 )
 
@@ -28,19 +37,19 @@ func Setup(cfg Config) (Application, error) {
 		return Application{}, err
 	}
 
-	tracerProvider, err := setupTracerProvider(cfg)
+	tracerProvider, traceExporter, err := setupTracerProvider(cfg)
 	if err != nil {
 		return Application{}, err
 	}
 
-	meterProvider, err := setupMeterProvider(cfg)
+	meterProvider, meterExporter, err := setupMeterProvider(cfg)
 	if err != nil {
 		return Application{}, err
 	}
 
 	logger.Debug("Initializing server", zap.String("server.name", cfg.Name), zap.String("server.environment", cfg.Environment))
 
-	db, err := setupDB(cfg, logger, tracerProvider)
+	db, dbConn, err := setupDB(cfg, logger, tracerProvider)
 	if err != nil {
 		return Application{}, err
 	}
@@ -52,9 +61,7 @@ func Setup(cfg Config) (Application, error) {
 
 	svc := setupServices(db, logger, tracerProvider, meterProvider)
 
-	var opts []grpc.ServerOption
-
-	opts = []grpc.ServerOption{
+	opts := []grpc.ServerOption{
 		grpc.ChainUnaryInterceptor(
 			otelgrpc.UnaryServerInterceptor(
 				otelgrpc.WithTracerProvider(tracerProvider),
@@ -83,13 +90,20 @@ func Setup(cfg Config) (Application, error) {
 		meterProvider:  meterProvider,
 		db:             db,
 		services:       svc,
+		shutdown: []shutDowner{
+			traceExporter,
+			meterExporter,
+		},
+		closer: []io.Closer{
+			dbConn,
+		},
 	}, nil
 }
 
 // setupServices initializes the Application Services.
 func setupServices(db *gorm.DB, logger *zap.Logger, tracerProvider trace.TracerProvider, meterProvider metric.MeterProvider) Services {
 	logger.Debug("Initializing services")
-	tasksService := service.NewTasks(db, logger, nil)
+	tasksService := service.NewTasks(db, logger, meterProvider.Meter("todo.huck.com.ar/tasks"))
 	return Services{
 		Tasks: tasksService,
 	}
@@ -108,12 +122,12 @@ func setupListener(cfg Config, logger *zap.Logger) (net.Listener, error) {
 }
 
 // setupDB initializes a new connection with a DB server.
-func setupDB(cfg Config, logger *zap.Logger, provider trace.TracerProvider) (*gorm.DB, error) {
+func setupDB(cfg Config, logger *zap.Logger, provider trace.TracerProvider) (*gorm.DB, *sql.DB, error) {
 	logger.Debug("Initializing DB connection", zap.String("db.engine", cfg.DB.Engine), zap.String("db.dsn", cfg.DB.DSN()))
 	db, err := database.SetupConnectionSQL(cfg.DB)
 	if err != nil {
 		logger.Error("Failed to initialize DB connection", zap.Error(err))
-		return nil, err
+		return nil, nil, err
 	}
 	err = db.Use(otelgorm.NewPlugin(
 		otelgorm.WithDBName(cfg.DB.Name),
@@ -122,9 +136,9 @@ func setupDB(cfg Config, logger *zap.Logger, provider trace.TracerProvider) (*go
 	))
 	if err != nil {
 		logger.Error("Failed to set up DB plugin", zap.Error(err))
-		return nil, err
+		return nil, nil, err
 	}
-	return db, nil
+	return db, nil, nil
 }
 
 // setupLogger initializes a new Zap Logger with the parameters specified by the given Config.
@@ -146,22 +160,77 @@ func setupLogger(cfg Config) (*zap.Logger, error) {
 	return logger, nil
 }
 
-func setupTracerProvider(cfg Config) (trace.TracerProvider, error) {
+func setupTracerProvider(cfg Config) (trace.TracerProvider, trace_sdk.SpanExporter, error) {
 	var tracerProvider trace.TracerProvider
+	var traceExporter trace_sdk.SpanExporter
 	switch cfg.Environment {
+	case "production", "staging":
+		ctx := context.Background()
+		res, err := newResource(ctx, cfg)
+		if err != nil {
+			return nil, nil, err
+		}
+		conn, err := grpc.DialContext(ctx, cfg.Tracing.Address(),
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
+		)
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to create gRPC connection to collector: %w", err)
+		}
+		traceExporter, err = otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to create trace exporter: %w", err)
+		}
+		bsp := trace_sdk.NewBatchSpanProcessor(traceExporter)
+		tracerProvider = trace_sdk.NewTracerProvider(
+			trace_sdk.WithSampler(trace_sdk.AlwaysSample()),
+			trace_sdk.WithResource(res),
+			trace_sdk.WithSpanProcessor(bsp),
+		)
 	default:
 		tracerProvider = trace.NewNoopTracerProvider()
 	}
-	return tracerProvider, nil
+
+	return tracerProvider, traceExporter, nil
 }
 
-func setupMeterProvider(cfg Config) (metric.MeterProvider, error) {
+func setupMeterProvider(cfg Config) (metric.MeterProvider, metric_sdk.Exporter, error) {
 	var meterProvider metric.MeterProvider
+	var meterExporter metric_sdk.Exporter
 	switch cfg.Environment {
+	case "production", "staging":
+		ctx := context.Background()
+		res, err := newResource(ctx, cfg)
+		if err != nil {
+			return nil, nil, err
+		}
+		conn, err := grpc.DialContext(ctx, cfg.Metrics.Address(),
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
+		)
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to create gRPC connection to collector: %w", err)
+		}
+		meterExporter, err = otlpmetricgrpc.New(ctx, otlpmetricgrpc.WithGRPCConn(conn))
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to create metrics exporter: %w", err)
+		}
+		meterProvider = metric_sdk.NewMeterProvider(
+			metric_sdk.WithReader(metric_sdk.NewPeriodicReader(meterExporter)),
+			metric_sdk.WithResource(res),
+		)
 	default:
 		meterProvider = noop.NewMeterProvider()
 	}
-	return meterProvider, nil
+	return meterProvider, meterExporter, nil
+}
+
+func newResource(ctx context.Context, cfg Config) (*resource.Resource, error) {
+	res, err := resource.New(ctx,
+		resource.WithAttributes(
+			semconv.ServiceName(cfg.Name),
+			semconv.DeploymentEnvironment(cfg.Environment),
+		),
+	)
+	return res, err
 }
 
 func InterceptorLogger(l *zap.Logger) grpc_logging.Logger {

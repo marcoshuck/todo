@@ -1,17 +1,24 @@
 package server
 
 import (
+	"context"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
+	"go.uber.org/multierr"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
+	"io"
 	"net"
 )
 
 // Services groups all the services exposed by a single gRPC Server.
 type Services struct {
 	Tasks tasksv1.TasksServiceServer
+}
+
+type shutDowner interface {
+	Shutdown(ctx context.Context) error
 }
 
 // grpcServer holds the method to serve a gRPC server using a net.Listener.
@@ -29,9 +36,29 @@ type Application struct {
 	services       Services
 	tracerProvider trace.TracerProvider
 	meterProvider  metric.MeterProvider
+	shutdown       []shutDowner
+	closer         []io.Closer
 }
 
 // Serve serves the application services.
 func (app Application) Serve() error {
 	return app.server.Serve(app.listener)
+}
+
+func (app Application) Shutdown() error {
+	ctx := context.Background()
+	var err error
+	for _, downer := range app.shutdown {
+		if downer == nil {
+			continue
+		}
+		err = multierr.Append(err, downer.Shutdown(ctx))
+	}
+	for _, closer := range app.closer {
+		if closer == nil {
+			continue
+		}
+		err = multierr.Append(err, closer.Close())
+	}
+	return err
 }

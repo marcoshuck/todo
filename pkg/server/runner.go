@@ -8,5 +8,5 @@ func Run(app Application) error {
 	if err := app.Serve(); err != nil {
 		return err
 	}
-	return nil
+	return app.Shutdown()
 }
