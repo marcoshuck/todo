@@ -22,13 +22,13 @@ func (svc *tasks) CreateTask(ctx context.Context, request *tasksv1.CreateTaskReq
 	svc.logger.Debug("Creating task", zap.String("task.title", request.GetTask().GetTitle()))
 	var task domain.Task
 	svc.logger.Debug("Filling out task information")
-	err := task.FromCreateRequest(request)
-	if err != nil {
+	task.FromAPI(request.GetTask())
+	if err := task.Validate(); err != nil {
 		svc.logger.Warn("User submitted an invalid task", zap.Error(err))
 		return nil, status.Errorf(codes.InvalidArgument, "invalid task: %s", err)
 	}
 	svc.logger.Debug("Persisting task in the database", zap.String("task.title", request.GetTask().GetTitle()))
-	err = svc.db.Model(&domain.Task{}).WithContext(ctx).Create(&task).Error
+	err := svc.db.Model(&domain.Task{}).WithContext(ctx).Create(&task).Error
 	if err != nil {
 		svc.logger.Error("Failed to create task", zap.Error(err))
 		return nil, status.Errorf(codes.Unavailable, "failed to create task")
