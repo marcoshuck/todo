@@ -89,7 +89,7 @@ func Setup(cfg Config) (Application, error) {
 // setupServices initializes the Application Services.
 func setupServices(db *gorm.DB, logger *zap.Logger, tracerProvider trace.TracerProvider, meterProvider metric.MeterProvider) Services {
 	logger.Debug("Initializing services")
-	tasksService := service.NewTasks(db, logger, tracerProvider.Tracer("todo.huck.com.ar/tasks"), nil)
+	tasksService := service.NewTasks(db, logger, nil)
 	return Services{
 		Tasks: tasksService,
 	}

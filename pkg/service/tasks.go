@@ -5,7 +5,6 @@ import (
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
 	"github.com/marcoshuck/todo/pkg/domain"
 	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -17,7 +16,6 @@ type tasks struct {
 	tasksv1.UnimplementedTasksServiceServer
 	db     *gorm.DB
 	logger *zap.Logger
-	tracer trace.Tracer
 	meter  metric.Meter
 }
 
@@ -43,11 +41,10 @@ func (svc *tasks) CreateTask(ctx context.Context, request *tasksv1.CreateTaskReq
 }
 
 // NewTasks initializes a new tasksv1.TasksServiceServer implementation.
-func NewTasks(db *gorm.DB, logger *zap.Logger, tracer trace.Tracer, meter metric.Meter) tasksv1.TasksServiceServer {
+func NewTasks(db *gorm.DB, logger *zap.Logger, meter metric.Meter) tasksv1.TasksServiceServer {
 	return &tasks{
 		db:     db,
 		logger: logger,
-		tracer: tracer,
 		meter:  meter,
 	}
 }
