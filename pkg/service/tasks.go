@@ -4,7 +4,7 @@ import (
 	"context"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
 	"github.com/marcoshuck/todo/pkg/domain"
-	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
@@ -18,15 +18,11 @@ type tasks struct {
 	db     *gorm.DB
 	logger *zap.Logger
 	tracer trace.Tracer
+	meter  metric.Meter
 }
 
 // CreateTask creates a Task.
 func (svc *tasks) CreateTask(ctx context.Context, request *tasksv1.CreateTaskRequest) (*tasksv1.Task, error) {
-	ctx, span := svc.tracer.Start(ctx, "CreateTask", trace.WithAttributes(
-		attribute.String("task.title", request.GetTask().GetTitle()),
-		attribute.String("task.description", request.GetTask().GetDescription()),
-	))
-	defer span.End()
 	svc.logger.Debug("Creating task", zap.String("task.title", request.GetTask().GetTitle()))
 
 	var task domain.Task
@@ -47,10 +43,11 @@ func (svc *tasks) CreateTask(ctx context.Context, request *tasksv1.CreateTaskReq
 }
 
 // NewTasks initializes a new tasksv1.TasksServiceServer implementation.
-func NewTasks(db *gorm.DB, logger *zap.Logger, tracer trace.Tracer) tasksv1.TasksServiceServer {
+func NewTasks(db *gorm.DB, logger *zap.Logger, tracer trace.Tracer, meter metric.Meter) tasksv1.TasksServiceServer {
 	return &tasks{
 		db:     db,
 		logger: logger,
 		tracer: tracer,
+		meter:  meter,
 	}
 }
