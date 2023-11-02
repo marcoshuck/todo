@@ -97,6 +97,10 @@ github.com/stretchr/testify v1.8.1/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o
 github.com/stretchr/testify v1.8.2/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
+github.com/uptrace/opentelemetry-go-extra/otelgorm v0.2.3 h1:girTS67d1m8+XUJLbNBDjCSH8BtujWFoI93W1OUjFIc=
+github.com/uptrace/opentelemetry-go-extra/otelgorm v0.2.3/go.mod h1:kjsn/ilDe5TABXwTy7Dg/Lfr2pRAjrCD+yPV+pbhOMY=
+github.com/uptrace/opentelemetry-go-extra/otelsql v0.2.3 h1:LNi0Qa7869/loPjz2kmMvp/jwZZnMZ9scMJKhDJ1DIo=
+github.com/uptrace/opentelemetry-go-extra/otelsql v0.2.3/go.mod h1:jyigonKik3C5V895QNiAGpKYKEvFuqjw9qAEZks1mUg=
 github.com/vektah/gqlparser/v2 v2.5.6 h1:Ou14T0N1s191eRMZ1gARVqohcbe1e8FrcONScsq8cRU=
 github.com/vektah/gqlparser/v2 v2.5.6/go.mod h1:z8xXUff237NntSuH8mLFijZ+1tjV1swDbpDqjJmk6ME=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
@@ -187,5 +191,5 @@ gorm.io/driver/postgres v1.5.0/go.mod h1:FUZXzO+5Uqg5zzwzv4KK49R8lvGIyscBOqYrtI1
 gorm.io/driver/sqlite v1.5.0 h1:zKYbzRCpBrT1bNijRnxLDJWPjVfImGEn0lSnUY5gZ+c=
 gorm.io/driver/sqlite v1.5.0/go.mod h1:kDMDfntV9u/vuMmz8APHtHF0b4nyBB7sfCieC6G8k8I=
 gorm.io/gorm v1.24.7-0.20230306060331-85eaf9eeda11/go.mod h1:L4uxeKpfBml98NYqVqwAdmV1a2nBtAec/cf3fpucW/k=
-gorm.io/gorm v1.25.0 h1:+KtYtb2roDz14EQe4bla8CbQlmb9dN3VejSai3lprfU=
-gorm.io/gorm v1.25.0/go.mod h1:L4uxeKpfBml98NYqVqwAdmV1a2nBtAec/cf3fpucW/k=
+gorm.io/gorm v1.25.4 h1:iyNd8fNAe8W9dvtlgeRI5zSVZPsq3OpcTu37cYcpCmw=
+gorm.io/gorm v1.25.4/go.mod h1:L4uxeKpfBml98NYqVqwAdmV1a2nBtAec/cf3fpucW/k=

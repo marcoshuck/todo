@@ -12,6 +12,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.1
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.2
 	github.com/stretchr/testify v1.8.4
+	github.com/uptrace/opentelemetry-go-extra/otelgorm v0.2.3
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.45.0
 	go.opentelemetry.io/otel/metric v1.19.0
 	go.opentelemetry.io/otel/trace v1.19.0
@@ -21,7 +22,7 @@ require (
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/sqlite v1.5.0
-	gorm.io/gorm v1.25.0
+	gorm.io/gorm v1.25.4
 )
 
 require (
@@ -45,6 +46,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.15 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/uptrace/opentelemetry-go-extra/otelsql v0.2.3 // indirect
 	github.com/vektah/gqlparser/v2 v2.5.6 // indirect
 	go.opentelemetry.io/otel v1.19.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect

@@ -7,7 +7,9 @@ import (
 	grpc_logging "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
 	"github.com/marcoshuck/todo/pkg/service"
+	"github.com/uptrace/opentelemetry-go-extra/otelgorm"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/noop"
 	"go.opentelemetry.io/otel/trace"
@@ -38,7 +40,7 @@ func Setup(cfg Config) (Application, error) {
 
 	logger.Debug("Initializing server", zap.String("server.name", cfg.Name), zap.String("server.environment", cfg.Environment))
 
-	db, err := setupDB(cfg, logger)
+	db, err := setupDB(cfg, logger, tracerProvider)
 	if err != nil {
 		return Application{}, err
 	}
@@ -106,11 +108,20 @@ func setupListener(cfg Config, logger *zap.Logger) (net.Listener, error) {
 }
 
 // setupDB initializes a new connection with a DB server.
-func setupDB(cfg Config, logger *zap.Logger) (*gorm.DB, error) {
+func setupDB(cfg Config, logger *zap.Logger, provider trace.TracerProvider) (*gorm.DB, error) {
 	logger.Debug("Initializing DB connection", zap.String("db.engine", cfg.DB.Engine), zap.String("db.dsn", cfg.DB.DSN()))
 	db, err := database.SetupConnectionSQL(cfg.DB)
 	if err != nil {
 		logger.Error("Failed to initialize DB connection", zap.Error(err))
+		return nil, err
+	}
+	err = db.Use(otelgorm.NewPlugin(
+		otelgorm.WithDBName(cfg.DB.Name),
+		otelgorm.WithAttributes(attribute.String("db.engine", cfg.DB.Engine)),
+		otelgorm.WithTracerProvider(provider),
+	))
+	if err != nil {
+		logger.Error("Failed to set up DB plugin", zap.Error(err))
 		return nil, err
 	}
 	return db, nil
