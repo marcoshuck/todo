@@ -7,6 +7,8 @@ import (
 	"github.com/gojaguar/jaguar/database"
 	grpc_logging "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
+	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
+	"github.com/marcoshuck/todo/pkg/domain"
 	"github.com/marcoshuck/todo/pkg/service"
 	"github.com/uptrace/opentelemetry-go-extra/otelgorm"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
@@ -54,6 +56,11 @@ func Setup(cfg Config) (Application, error) {
 		return Application{}, err
 	}
 
+	err = domain.MigrateModels(db)
+	if err != nil {
+		return Application{}, err
+	}
+
 	l, err := setupListener(cfg, logger)
 	if err != nil {
 		return Application{}, err
@@ -81,6 +88,7 @@ func Setup(cfg Config) (Application, error) {
 	}
 
 	srv := grpc.NewServer(opts...)
+	registerServices(srv, svc)
 
 	return Application{
 		server:         srv,
@@ -98,6 +106,10 @@ func Setup(cfg Config) (Application, error) {
 			dbConn,
 		},
 	}, nil
+}
+
+func registerServices(srv *grpc.Server, svc Services) {
+	tasksv1.RegisterTasksServiceServer(srv, svc.Tasks)
 }
 
 // setupServices initializes the Application Services.

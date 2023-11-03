@@ -9,7 +9,7 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 go build -a -ldflags '-extldflags "-static"' -o gateway ./cmd/gateway
+RUN CGO_ENABLED=1 go build -a -ldflags '-extldflags "-static"' -o gateway ./cmd/gateway
 
 WORKDIR /dist
 RUN cp /build/gateway .

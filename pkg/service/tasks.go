@@ -49,9 +49,10 @@ func (svc *tasks) CreateTask(ctx context.Context, request *tasksv1.CreateTaskReq
 
 // NewTasks initializes a new tasksv1.TasksServiceServer implementation.
 func NewTasks(db *gorm.DB, logger *zap.Logger, meter metric.Meter) tasksv1.TasksServiceServer {
+	tasksLogger := logger.Named("service.tasks")
 	return &tasks{
 		db:     db,
-		logger: logger,
+		logger: tasksLogger,
 		meter:  meter,
 	}
 }

@@ -1,0 +1,40 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+
+exporters:
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+    namespace: todo
+    const_labels:
+      app: todo
+  logging:
+    loglevel: debug
+
+  otlp/jaeger:
+    endpoint: "jaeger:4317"
+    tls:
+      insecure: true
+
+processors:
+  batch:
+
+extensions:
+  health_check:
+  pprof:
+    endpoint: :1888
+  zpages:
+    endpoint: :55679
+
+service:
+  extensions: [pprof, zpages, health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [ otlp/jaeger]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [prometheus]

@@ -27,6 +27,7 @@ go.work
 
 # Environment variables
 .env.example
+.env
 
 # Git folder
 .git
