@@ -17,7 +17,9 @@ type Services struct {
 	Tasks tasksv1.TasksServiceServer
 }
 
+// shutDowner holds a method to gracefully shut down a service or integration.
 type shutDowner interface {
+	// Shutdown releases any held computational resources.
 	Shutdown(ctx context.Context) error
 }
 
@@ -45,6 +47,7 @@ func (app Application) Serve() error {
 	return app.server.Serve(app.listener)
 }
 
+// Shutdown releases any held resources by dependencies of this Application.
 func (app Application) Shutdown() error {
 	ctx := context.Background()
 	var err error
