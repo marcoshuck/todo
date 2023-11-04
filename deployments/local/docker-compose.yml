@@ -27,9 +27,8 @@ services:
     ports:
       - "8080:8080"
     restart: always
-    environment:
-      GRPC_SERVER: "app:3030"
-      GATEWAY_ADDRESS: "0.0.0.0:8080"
+    env_file:
+      - .env
     networks:
       - transport
   db:

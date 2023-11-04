@@ -1,12 +1,13 @@
 package main
 
 import (
+	"github.com/marcoshuck/todo/pkg/conf"
 	"github.com/marcoshuck/todo/pkg/server"
 	"log"
 )
 
 func main() {
-	cfg, err := server.ReadConfig()
+	cfg, err := conf.ReadServerConfig()
 	if err != nil {
 		log.Fatalln("Failed to read configuration:", err)
 	}

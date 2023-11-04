@@ -1,4 +1,4 @@
-package server
+package conf
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -16,7 +16,7 @@ func TestConfig_Default(t *testing.T) {
 	require.NoError(t, err)
 	defer cancel()
 
-	cfg, err := ReadConfig()
+	cfg, err := ReadServerConfig()
 	assert.NoError(t, err)
 	assert.NotZero(t, cfg)
 	assert.Equal(t, 3030, cfg.Port)

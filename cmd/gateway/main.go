@@ -2,42 +2,46 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-	grpc_logging "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
-	"github.com/marcoshuck/todo/pkg/server"
+	"github.com/marcoshuck/todo/pkg/conf"
+	"github.com/marcoshuck/todo/pkg/interceptors"
+	"github.com/marcoshuck/todo/pkg/telemetry"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net/http"
-	"os"
 	"time"
 )
 
 func main() {
 	ctx := context.Background()
+
+	cfg, err := conf.ReadClientConfig()
+
+	t, err := telemetry.SetupTelemetry(cfg.Config, cfg.Tracing, cfg.Metrics)
+	if err != nil {
+		log.Fatalln("Failed to initialize t")
+	}
+
 	logger, err := zap.NewProduction()
 	if err != nil {
 		log.Fatalln("Failed to initialize logger")
 	}
 	mux := runtime.NewServeMux()
-	endpoint := os.Getenv("GRPC_SERVER")
-	addr := os.Getenv("GATEWAY_ADDRESS")
+
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithBlock(),
-		grpc.WithUnaryInterceptor(
-			grpc_logging.UnaryClientInterceptor(server.InterceptorLogger(logger)),
-		),
-		grpc.WithStreamInterceptor(
-			grpc_logging.StreamClientInterceptor(server.InterceptorLogger(logger)),
-		),
+		interceptors.NewClientUnaryInterceptors(t.Logger, t.TracerProvider, t.MeterProvider),
+		interceptors.NewClientStreamInterceptors(t.Logger, t.TracerProvider, t.MeterProvider),
 	}
-	err = tasksv1.RegisterTasksServiceHandlerFromEndpoint(ctx, mux, endpoint, opts)
+	err = tasksv1.RegisterTasksServiceHandlerFromEndpoint(ctx, mux, cfg.ServerAddress, opts)
 	if err != nil {
 		log.Fatalln("Failed to register tasks service:", err)
 	}
@@ -58,6 +62,7 @@ func main() {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 	r.Mount("/", mux)
+	addr := fmt.Sprintf(":%d", cfg.Port)
 	logger.Info("Listening...", zap.String("address", addr))
 	if err := http.ListenAndServe(addr, r); err != nil {
 		logger.Fatal("Failed to listen and serve", zap.Error(err))
