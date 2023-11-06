@@ -32,10 +32,6 @@ func main() {
 		log.Fatalln("Failed to initialize telemetry:", err)
 	}
 
-	logger, err := zap.NewProduction()
-	if err != nil {
-		log.Fatalln("Failed to initialize logger:", err)
-	}
 	mux := runtime.NewServeMux()
 
 	opts := []grpc.DialOption{
@@ -67,8 +63,8 @@ func main() {
 	}))
 	r.Mount("/", mux)
 	addr := fmt.Sprintf(":%d", cfg.Port)
-	logger.Info("Listening...", zap.String("address", addr))
+	telemeter.Logger.Info("Listening...", zap.String("address", addr))
 	if err := http.ListenAndServe(addr, r); err != nil {
-		logger.Fatal("Failed to listen and serve", zap.Error(err))
+		telemeter.Logger.Fatal("Failed to listen and serve", zap.Error(err))
 	}
 }
