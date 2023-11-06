@@ -2,29 +2,40 @@ package interceptors
 
 import (
 	grpc_logging "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
+	"github.com/marcoshuck/todo/pkg/telemetry"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/trace"
-	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"time"
 )
 
-func NewClientUnaryInterceptors(logger *zap.Logger, tracerProvider trace.TracerProvider, meterProvider metric.MeterProvider) grpc.DialOption {
+func NewClientUnaryInterceptors(telemeter telemetry.Telemetry) grpc.DialOption {
 	return grpc.WithChainUnaryInterceptor(
 		otelgrpc.UnaryClientInterceptor(
-			otelgrpc.WithTracerProvider(tracerProvider),
-			otelgrpc.WithMeterProvider(meterProvider),
+			otelgrpc.WithTracerProvider(telemeter.TracerProvider),
+			otelgrpc.WithMeterProvider(telemeter.MeterProvider),
 		),
-		grpc_logging.UnaryClientInterceptor(interceptorLogger(logger)),
+		grpc_logging.UnaryClientInterceptor(interceptorLogger(telemeter.Logger)),
+		retry.UnaryClientInterceptor(
+			retry.WithCodes(codes.ResourceExhausted, codes.Unavailable),
+			retry.WithMax(10),
+			retry.WithBackoff(retry.BackoffExponential(50*time.Millisecond)),
+		),
 	)
 }
 
-func NewClientStreamInterceptors(logger *zap.Logger, tracerProvider trace.TracerProvider, meterProvider metric.MeterProvider) grpc.DialOption {
+func NewClientStreamInterceptors(telemeter telemetry.Telemetry) grpc.DialOption {
 	return grpc.WithChainStreamInterceptor(
 		otelgrpc.StreamClientInterceptor(
-			otelgrpc.WithTracerProvider(tracerProvider),
-			otelgrpc.WithMeterProvider(meterProvider),
+			otelgrpc.WithTracerProvider(telemeter.TracerProvider),
+			otelgrpc.WithMeterProvider(telemeter.MeterProvider),
 		),
-		grpc_logging.StreamClientInterceptor(interceptorLogger(logger)),
+		grpc_logging.StreamClientInterceptor(interceptorLogger(telemeter.Logger)),
+		retry.StreamClientInterceptor(
+			retry.WithCodes(codes.ResourceExhausted, codes.Unavailable),
+			retry.WithMax(10),
+			retry.WithBackoff(retry.BackoffExponential(50*time.Millisecond)),
+		),
 	)
 }

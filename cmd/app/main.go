@@ -15,7 +15,6 @@ func main() {
 	if err != nil {
 		log.Fatalln("Failed to initialize application:", err)
 	}
-
 	if err := server.Run(app); err != nil {
 		log.Fatalln("Application exited abruptly:", err)
 	}

@@ -7,14 +7,18 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
+	"google.golang.org/grpc/health"
+	healthv1 "google.golang.org/grpc/health/grpc_health_v1"
 	"gorm.io/gorm"
 	"io"
 	"net"
+	"time"
 )
 
 // Services groups all the services exposed by a single gRPC Server.
 type Services struct {
-	Tasks tasksv1.TasksServiceServer
+	Tasks  tasksv1.TasksServiceServer
+	Health *health.Server
 }
 
 // shutDowner holds a method to gracefully shut down a service or integration.
@@ -42,8 +46,9 @@ type Application struct {
 	closer         []io.Closer
 }
 
-// Serve serves the application services.
-func (app Application) Serve() error {
+// Run serves the application services.
+func (app Application) Run() error {
+	go app.checkHealth()
 	return app.server.Serve(app.listener)
 }
 
@@ -64,4 +69,23 @@ func (app Application) Shutdown() error {
 		err = multierr.Append(err, closer.Close())
 	}
 	return err
+}
+
+func (app Application) checkHealth() {
+	var state healthv1.HealthCheckResponse_ServingStatus
+	for {
+		state = healthv1.HealthCheckResponse_SERVING
+
+		db, err := app.db.DB()
+		if err != nil {
+			state = healthv1.HealthCheckResponse_NOT_SERVING
+		}
+		if err = db.Ping(); err != nil {
+			state = healthv1.HealthCheckResponse_NOT_SERVING
+		}
+
+		app.services.Health.SetServingStatus("", state)
+
+		time.Sleep(10 * time.Second)
+	}
 }

@@ -10,7 +10,8 @@ services:
       - "3030:3030"
     restart: always
     env_file:
-      - .env
+      - .env.common
+      - .env.app
     networks:
       - transport
       - persistence
@@ -28,9 +29,14 @@ services:
       - "8080:8080"
     restart: always
     env_file:
-      - .env
+      - .env.common
+      - .env.gateway
     networks:
       - transport
+      - monitoring
+    depends_on:
+      - app
+      - collector
   db:
     image: mysql:8
     container_name: db

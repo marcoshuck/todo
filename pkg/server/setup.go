@@ -15,6 +15,8 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	healthv1 "google.golang.org/grpc/health/grpc_health_v1"
 	"gorm.io/gorm"
 	"io"
 	"net"
@@ -48,8 +50,8 @@ func Setup(cfg conf.ServerConfig) (Application, error) {
 	svc := setupServices(db, telemeter.Logger, telemeter.TracerProvider, telemeter.MeterProvider)
 
 	srv := grpc.NewServer(
-		interceptors.NewServerUnaryInterceptors(telemeter.Logger, telemeter.TracerProvider, telemeter.MeterProvider),
-		interceptors.NewServerStreamInterceptors(telemeter.Logger, telemeter.TracerProvider, telemeter.MeterProvider),
+		interceptors.NewServerUnaryInterceptors(telemeter),
+		interceptors.NewServerStreamInterceptors(telemeter),
 	)
 	registerServices(srv, svc)
 
@@ -73,14 +75,17 @@ func Setup(cfg conf.ServerConfig) (Application, error) {
 
 func registerServices(srv *grpc.Server, svc Services) {
 	tasksv1.RegisterTasksServiceServer(srv, svc.Tasks)
+	healthv1.RegisterHealthServer(srv, svc.Health)
 }
 
 // setupServices initializes the Application Services.
 func setupServices(db *gorm.DB, logger *zap.Logger, tracerProvider trace.TracerProvider, meterProvider metric.MeterProvider) Services {
 	logger.Debug("Initializing services")
 	tasksService := service.NewTasks(db, logger, meterProvider.Meter("todo.huck.com.ar/tasks"))
+	healthService := health.NewServer()
 	return Services{
-		Tasks: tasksService,
+		Tasks:  tasksService,
+		Health: healthService,
 	}
 }
 
@@ -113,5 +118,10 @@ func setupDB(cfg conf.ServerConfig, logger *zap.Logger, provider trace.TracerPro
 		logger.Error("Failed to set up DB plugin", zap.Error(err))
 		return nil, nil, err
 	}
-	return db, nil, nil
+	dbConn, err := db.DB()
+	if err != nil {
+		logger.Error("Failed get db connection", zap.Error(err))
+		return nil, nil, err
+	}
+	return db, dbConn, nil
 }

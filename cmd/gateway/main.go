@@ -23,23 +23,26 @@ func main() {
 	ctx := context.Background()
 
 	cfg, err := conf.ReadClientConfig()
-
-	t, err := telemetry.SetupTelemetry(cfg.Config, cfg.Tracing, cfg.Metrics)
 	if err != nil {
-		log.Fatalln("Failed to initialize t")
+		log.Fatalln("Failed to read client config:", err)
+	}
+
+	telemeter, err := telemetry.SetupTelemetry(cfg.Config, cfg.Tracing, cfg.Metrics)
+	if err != nil {
+		log.Fatalln("Failed to initialize telemetry:", err)
 	}
 
 	logger, err := zap.NewProduction()
 	if err != nil {
-		log.Fatalln("Failed to initialize logger")
+		log.Fatalln("Failed to initialize logger:", err)
 	}
 	mux := runtime.NewServeMux()
 
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithBlock(),
-		interceptors.NewClientUnaryInterceptors(t.Logger, t.TracerProvider, t.MeterProvider),
-		interceptors.NewClientStreamInterceptors(t.Logger, t.TracerProvider, t.MeterProvider),
+		interceptors.NewClientUnaryInterceptors(telemeter),
+		interceptors.NewClientStreamInterceptors(telemeter),
 	}
 	err = tasksv1.RegisterTasksServiceHandlerFromEndpoint(ctx, mux, cfg.ServerAddress, opts)
 	if err != nil {
@@ -51,6 +54,7 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
+	r.Use(middleware.Heartbeat("/healthz"))
 	r.Use(cors.Handler(cors.Options{
 		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
 		AllowedOrigins: []string{"https://*", "http://*"},

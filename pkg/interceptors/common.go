@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -46,6 +47,9 @@ func interceptorLogger(l *zap.Logger) logging.Logger {
 	})
 }
 
-func RecoveryHandler(p any) error {
-	return status.Errorf(codes.Unknown, "panic triggered: %v", p)
+func RecoveryHandler(logger *zap.Logger) grpc_recovery.RecoveryHandlerFunc {
+	return func(p any) (err error) {
+		logger.Error("recoverying from panic", zap.Any("panic", p))
+		return status.Errorf(codes.Unknown, "panic triggered: %v", p)
+	}
 }
