@@ -1,12 +1,13 @@
 package main
 
 import (
+	"github.com/marcoshuck/todo/pkg/conf"
 	"github.com/marcoshuck/todo/pkg/server"
 	"log"
 )
 
 func main() {
-	cfg, err := server.ReadConfig()
+	cfg, err := conf.ReadServerConfig()
 	if err != nil {
 		log.Fatalln("Failed to read configuration:", err)
 	}
@@ -14,7 +15,6 @@ func main() {
 	if err != nil {
 		log.Fatalln("Failed to initialize application:", err)
 	}
-
 	if err := server.Run(app); err != nil {
 		log.Fatalln("Application exited abruptly:", err)
 	}

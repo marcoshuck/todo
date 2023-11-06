@@ -1,15 +1,30 @@
 package server
 
 import (
+	"context"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
+	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/trace"
+	"go.uber.org/multierr"
 	"go.uber.org/zap"
+	"google.golang.org/grpc/health"
+	healthv1 "google.golang.org/grpc/health/grpc_health_v1"
 	"gorm.io/gorm"
+	"io"
 	"net"
+	"time"
 )
 
 // Services groups all the services exposed by a single gRPC Server.
 type Services struct {
-	Tasks tasksv1.TasksServiceServer
+	Tasks  tasksv1.TasksServiceServer
+	Health *health.Server
+}
+
+// shutDowner holds a method to gracefully shut down a service or integration.
+type shutDowner interface {
+	// Shutdown releases any held computational resources.
+	Shutdown(ctx context.Context) error
 }
 
 // grpcServer holds the method to serve a gRPC server using a net.Listener.
@@ -20,14 +35,57 @@ type grpcServer interface {
 
 // Application abstracts all the functional components to be run by the server.
 type Application struct {
-	server   grpcServer
-	listener net.Listener
-	logger   *zap.Logger
-	db       *gorm.DB
-	services Services
+	server         grpcServer
+	listener       net.Listener
+	logger         *zap.Logger
+	db             *gorm.DB
+	services       Services
+	tracerProvider trace.TracerProvider
+	meterProvider  metric.MeterProvider
+	shutdown       []shutDowner
+	closer         []io.Closer
 }
 
-// Serve serves the application services.
-func (app Application) Serve() error {
+// Run serves the application services.
+func (app Application) Run() error {
+	go app.checkHealth()
 	return app.server.Serve(app.listener)
+}
+
+// Shutdown releases any held resources by dependencies of this Application.
+func (app Application) Shutdown() error {
+	ctx := context.Background()
+	var err error
+	for _, downer := range app.shutdown {
+		if downer == nil {
+			continue
+		}
+		err = multierr.Append(err, downer.Shutdown(ctx))
+	}
+	for _, closer := range app.closer {
+		if closer == nil {
+			continue
+		}
+		err = multierr.Append(err, closer.Close())
+	}
+	return err
+}
+
+func (app Application) checkHealth() {
+	var state healthv1.HealthCheckResponse_ServingStatus
+	for {
+		state = healthv1.HealthCheckResponse_SERVING
+
+		db, err := app.db.DB()
+		if err != nil {
+			state = healthv1.HealthCheckResponse_NOT_SERVING
+		}
+		if err = db.Ping(); err != nil {
+			state = healthv1.HealthCheckResponse_NOT_SERVING
+		}
+
+		app.services.Health.SetServingStatus("", state)
+
+		time.Sleep(10 * time.Second)
+	}
 }

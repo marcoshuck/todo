@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/gojaguar/jaguar/config"
+	"github.com/marcoshuck/todo/pkg/conf"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/test/bufconn"
@@ -16,17 +17,11 @@ func TestServerSuite(t *testing.T) {
 
 type ServerTestSuite struct {
 	suite.Suite
-	cancelSetEnvAppName func()
-	cancelSetEnvDBName  func()
 }
 
 func (suite *ServerTestSuite) SetupSuite() {
-	var err error
-	err, suite.cancelSetEnvAppName = setEnv("APPLICATION_NAME", "todo")
-	suite.Require().NoError(err)
-
-	err, suite.cancelSetEnvDBName = setEnv("DATABASE_NAME", "todo_db")
-	suite.Require().NoError(err)
+	suite.Require().NoError(os.Setenv("APPLICATION_NAME", "todo"))
+	suite.Require().NoError(os.Setenv("DATABASE_NAME", "todo_db"))
 }
 
 func (suite *ServerTestSuite) SetupTest() {
@@ -38,13 +33,13 @@ func (suite *ServerTestSuite) TearDownTest() {
 }
 
 func (suite *ServerTestSuite) TearDownSuite() {
-	suite.cancelSetEnvAppName()
-	suite.cancelSetEnvDBName()
+	suite.Require().NoError(os.Unsetenv("APPLICATION_NAME"))
+	suite.Require().NoError(os.Unsetenv("DATABASE_NAME"))
 	suite.Require().NoError(os.Remove("todo_db.db"))
 }
 
 func (suite *ServerTestSuite) TestSetup() {
-	cfg, err := ReadConfig()
+	cfg, err := conf.ReadServerConfig()
 	suite.Require().NoError(err)
 	suite.Require().NotZero(cfg)
 

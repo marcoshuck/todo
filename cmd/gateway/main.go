@@ -8,21 +8,39 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
+	"github.com/marcoshuck/todo/pkg/conf"
+	"github.com/marcoshuck/todo/pkg/interceptors"
+	"github.com/marcoshuck/todo/pkg/telemetry"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net/http"
-	"os"
 	"time"
 )
 
 func main() {
 	ctx := context.Background()
+
+	cfg, err := conf.ReadClientConfig()
+	if err != nil {
+		log.Fatalln("Failed to read client config:", err)
+	}
+
+	telemeter, err := telemetry.SetupTelemetry(cfg.Config, cfg.Tracing, cfg.Metrics)
+	if err != nil {
+		log.Fatalln("Failed to initialize telemetry:", err)
+	}
+
 	mux := runtime.NewServeMux()
-	endpoint := os.Getenv("HOST")
-	port := os.Getenv("PORT")
-	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	err := tasksv1.RegisterTasksServiceHandlerFromEndpoint(ctx, mux, endpoint, opts)
+
+	opts := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithBlock(),
+		interceptors.NewClientUnaryInterceptors(telemeter),
+		interceptors.NewClientStreamInterceptors(telemeter),
+	}
+	err = tasksv1.RegisterTasksServiceHandlerFromEndpoint(ctx, mux, cfg.ServerAddress, opts)
 	if err != nil {
 		log.Fatalln("Failed to register tasks service:", err)
 	}
@@ -32,6 +50,7 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
+	r.Use(middleware.Heartbeat("/healthz"))
 	r.Use(cors.Handler(cors.Options{
 		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
 		AllowedOrigins: []string{"https://*", "http://*"},
@@ -42,9 +61,10 @@ func main() {
 		AllowCredentials: false,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
-	r.Handle("/api", mux)
-	log.Println("Listening on port:", port)
-	if err := http.ListenAndServe(fmt.Sprintf(":%s", port), r); err != nil {
-		log.Fatalln("Failed to listen and serve:", err)
+	r.Mount("/", mux)
+	addr := fmt.Sprintf(":%d", cfg.Port)
+	telemeter.Logger.Info("Listening...", zap.String("address", addr))
+	if err := http.ListenAndServe(addr, r); err != nil {
+		telemeter.Logger.Fatal("Failed to listen and serve", zap.Error(err))
 	}
 }

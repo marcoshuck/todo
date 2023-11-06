@@ -5,6 +5,7 @@ import (
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
 	"github.com/marcoshuck/todo/pkg/domain"
 	"github.com/stretchr/testify/suite"
+	"go.opentelemetry.io/otel/metric/noop"
 	"go.uber.org/zap"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -31,7 +32,7 @@ func (suite *TasksServiceTestSuite) SetupTest() {
 	suite.Require().NoError(err)
 	suite.Require().NoError(suite.db.Migrator().AutoMigrate(&domain.Task{}))
 
-	suite.svc = NewTasks(suite.db, zap.NewNop())
+	suite.svc = NewTasks(suite.db, zap.NewNop(), noop.NewMeterProvider().Meter(""))
 }
 
 func (suite *TasksServiceTestSuite) TearDownTest() {
