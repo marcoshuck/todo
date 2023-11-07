@@ -7,6 +7,8 @@ import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/api/client.proto";
 import "google/protobuf/timestamp.proto";
+import "buf/validate/validate.proto";
+
 
 message Task {
   option (google.api.resource) = {
@@ -17,7 +19,7 @@ message Task {
   };
 
   int64 id = 1;
-  string title = 2;
+  string title = 2 [(buf.validate.field).string.min_len = 3];
   string description = 3;
   google.protobuf.Timestamp deadline = 4;
   google.protobuf.Timestamp completed_at = 5;
