@@ -50,21 +50,21 @@ func ReadServerConfig() (ServerConfig, error) {
 	return cfg, nil
 }
 
-// ClientConfig holds the configuration for gRPC clients. It currently uses env vars, but it can eventually
+// GatewayConfig holds the configuration for gRPC clients. It currently uses env vars, but it can eventually
 // migrate to a different config provider.
-type ClientConfig struct {
+type GatewayConfig struct {
 	config.Config
 	ServerAddress string  `env:"SERVER_ADDRESS"`
 	Metrics       Metrics `envPrefix:"METRICS_"`
 	Tracing       Tracing `envPrefix:"TRACING_"`
 }
 
-// ReadClientConfig reads the ClientConfig from environment variables.
-func ReadClientConfig() (ClientConfig, error) {
-	var cfg ClientConfig
+// ReadGatewayConfig reads the GatewayConfig from environment variables.
+func ReadGatewayConfig() (GatewayConfig, error) {
+	var cfg GatewayConfig
 	err := env.Parse(&cfg)
 	if err != nil {
-		return ClientConfig{}, err
+		return GatewayConfig{}, err
 	}
 	return cfg, nil
 }

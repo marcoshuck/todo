@@ -13,6 +13,7 @@ func NewServerUnaryInterceptors(telemeter telemetry.Telemetry) grpc.ServerOption
 		otelgrpc.UnaryServerInterceptor(
 			otelgrpc.WithTracerProvider(telemeter.TracerProvider),
 			otelgrpc.WithMeterProvider(telemeter.MeterProvider),
+			otelgrpc.WithPropagators(telemeter.Propagator),
 		),
 		grpc_logging.UnaryServerInterceptor(interceptorLogger(telemeter.Logger)),
 		grpc_recovery.UnaryServerInterceptor(grpc_recovery.WithRecoveryHandler(RecoveryHandler(telemeter.Logger))),
@@ -24,6 +25,7 @@ func NewServerStreamInterceptors(telemeter telemetry.Telemetry) grpc.ServerOptio
 		otelgrpc.StreamServerInterceptor(
 			otelgrpc.WithTracerProvider(telemeter.TracerProvider),
 			otelgrpc.WithMeterProvider(telemeter.MeterProvider),
+			otelgrpc.WithPropagators(telemeter.Propagator),
 		),
 		grpc_logging.StreamServerInterceptor(interceptorLogger(telemeter.Logger)),
 		grpc_recovery.StreamServerInterceptor(grpc_recovery.WithRecoveryHandler(RecoveryHandler(telemeter.Logger))),

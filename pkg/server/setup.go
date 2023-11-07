@@ -70,6 +70,7 @@ func Setup(cfg conf.ServerConfig) (Application, error) {
 		closer: []io.Closer{
 			dbConn,
 		},
+		cfg: cfg,
 	}, nil
 }
 

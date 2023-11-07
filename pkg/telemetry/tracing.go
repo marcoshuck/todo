@@ -6,6 +6,7 @@ import (
 	"github.com/gojaguar/jaguar/config"
 	"github.com/marcoshuck/todo/pkg/conf"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/propagation"
 	trace_sdk "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -45,6 +46,7 @@ func newTracing(cfg config.Config, tracing conf.Tracing) (trace.TracerProvider, 
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create trace exporter: %w", err)
 	}
+	propagation.NewCompositeTextMapPropagator()
 	bsp := trace_sdk.NewBatchSpanProcessor(traceExporter)
 	tracerProvider := trace_sdk.NewTracerProvider(
 		trace_sdk.WithSampler(trace_sdk.AlwaysSample()),

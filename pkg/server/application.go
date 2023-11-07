@@ -2,7 +2,10 @@ package server
 
 import (
 	"context"
+	"fmt"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
+	"github.com/marcoshuck/todo/pkg/conf"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/multierr"
@@ -12,6 +15,7 @@ import (
 	"gorm.io/gorm"
 	"io"
 	"net"
+	"net/http"
 	"time"
 )
 
@@ -44,11 +48,13 @@ type Application struct {
 	meterProvider  metric.MeterProvider
 	shutdown       []shutDowner
 	closer         []io.Closer
+	cfg            conf.ServerConfig
 }
 
 // Run serves the application services.
 func (app Application) Run() error {
 	go app.checkHealth()
+	go app.serveMetrics()
 	return app.server.Serve(app.listener)
 }
 
@@ -87,5 +93,11 @@ func (app Application) checkHealth() {
 		app.services.Health.SetServingStatus("", state)
 
 		time.Sleep(10 * time.Second)
+	}
+}
+
+func (app Application) serveMetrics() {
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", app.cfg.Port+1), promhttp.Handler()); err != nil {
+		app.logger.Error("Failed while running metrics server", zap.Error(err))
 	}
 }

@@ -15,6 +15,7 @@ func NewClientUnaryInterceptors(telemeter telemetry.Telemetry) grpc.DialOption {
 		otelgrpc.UnaryClientInterceptor(
 			otelgrpc.WithTracerProvider(telemeter.TracerProvider),
 			otelgrpc.WithMeterProvider(telemeter.MeterProvider),
+			otelgrpc.WithPropagators(telemeter.Propagator),
 		),
 		grpc_logging.UnaryClientInterceptor(interceptorLogger(telemeter.Logger)),
 		retry.UnaryClientInterceptor(
@@ -30,6 +31,7 @@ func NewClientStreamInterceptors(telemeter telemetry.Telemetry) grpc.DialOption 
 		otelgrpc.StreamClientInterceptor(
 			otelgrpc.WithTracerProvider(telemeter.TracerProvider),
 			otelgrpc.WithMeterProvider(telemeter.MeterProvider),
+			otelgrpc.WithPropagators(telemeter.Propagator),
 		),
 		grpc_logging.StreamClientInterceptor(interceptorLogger(telemeter.Logger)),
 		retry.StreamClientInterceptor(

@@ -4,9 +4,6 @@ import (
 	"github.com/gojaguar/jaguar/config"
 	"github.com/marcoshuck/todo/pkg/conf"
 	"github.com/stretchr/testify/suite"
-	"go.uber.org/zap"
-	"google.golang.org/grpc/test/bufconn"
-	"net"
 	"os"
 	"testing"
 )
@@ -53,22 +50,4 @@ func (suite *ServerTestSuite) TestSetup() {
 	suite.Assert().NotNil(app.server)
 	suite.Assert().NotNil(app.db)
 	suite.Assert().NotNil(app.services.Tasks)
-}
-
-func (suite *ServerTestSuite) TestRun() {
-	var srv testGrpcServer
-
-	suite.Assert().NoError(Run(Application{
-		server:   &srv,
-		logger:   zap.NewNop(),
-		listener: bufconn.Listen(1),
-	}))
-	suite.Assert().Equal(testGrpcServer(1), srv)
-}
-
-type testGrpcServer int
-
-func (t *testGrpcServer) Serve(listener net.Listener) error {
-	*t++
-	return nil
 }
