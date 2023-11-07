@@ -54,17 +54,6 @@ func (suite *TasksServiceTestSuite) TestCreate_NilBody() {
 	suite.Assert().Nil(res)
 }
 
-func (suite *TasksServiceTestSuite) TestCreate_InvalidArgument() {
-	res, err := suite.svc.CreateTask(context.Background(), &tasksv1.CreateTaskRequest{
-		Task: &tasksv1.Task{
-			Title: "",
-		},
-	})
-	suite.Assert().Error(err)
-	suite.Assert().ErrorContains(err, "invalid task")
-	suite.Assert().Nil(res)
-}
-
 func (suite *TasksServiceTestSuite) TestCreate_Success() {
 	var before int64
 	suite.Require().NoError(suite.db.Model(&domain.Task{}).Count(&before).Error)

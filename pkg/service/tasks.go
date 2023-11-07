@@ -30,11 +30,6 @@ func (svc *tasks) CreateTask(ctx context.Context, request *tasksv1.CreateTaskReq
 	svc.logger.Debug("Filling out task information")
 	span.AddEvent("Parsing task from API request")
 	task.FromAPI(request.GetTask())
-	if err := task.Validate(); err != nil {
-		svc.logger.Warn("User submitted an invalid task", zap.Error(err))
-		span.RecordError(err)
-		return nil, status.Errorf(codes.InvalidArgument, "invalid task: %s", err)
-	}
 	span.AddEvent("Persisting task in the database")
 	svc.logger.Debug("Persisting task in the database", zap.String("task.title", request.GetTask().GetTitle()))
 	err := svc.db.Model(&domain.Task{}).WithContext(ctx).Create(&task).Error

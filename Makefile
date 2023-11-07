@@ -16,8 +16,13 @@ lint:
 	buf lint
 	golangci-lint -v run
 
-build:
-	go build
+build-app:
+	go build -a -ldflags '-extldflags "-static"' -o app ./cmd/app
+
+build-gw:
+	go build -a -ldflags '-extldflags "-static"' -o gateway ./cmd/gateway
+
+build: build-app build-gw
 
 test:
 	go test -race -covermode=atomic -coverprofile=coverage.tx -v ./...

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
 	"github.com/marcoshuck/todo/pkg/serializer"
-	"github.com/marcoshuck/todo/pkg/validator"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gopkg.in/yaml.v3"
 	"gorm.io/gorm"
@@ -80,9 +79,4 @@ func (t *Task) YAML() ([]byte, error) {
 // FromYAML converts a slice of bytes in YAML format to a Task.
 func (t *Task) FromYAML(data []byte) error {
 	return yaml.Unmarshal(data, t)
-}
-
-// Validate validates the current Task
-func (t *Task) Validate() error {
-	return validator.Validator.Struct(t)
 }

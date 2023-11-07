@@ -2,6 +2,7 @@ package server
 
 import (
 	"database/sql"
+	"github.com/bufbuild/protovalidate-go"
 	"github.com/gojaguar/jaguar/database"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
 	"github.com/marcoshuck/todo/pkg/conf"
@@ -49,10 +50,12 @@ func Setup(cfg conf.ServerConfig) (Application, error) {
 
 	svc := setupServices(db, telemeter.Logger, telemeter.TracerProvider, telemeter.MeterProvider)
 
-	srv := grpc.NewServer(
-		interceptors.NewServerUnaryInterceptors(telemeter),
-		interceptors.NewServerStreamInterceptors(telemeter),
-	)
+	validator, err := protovalidate.New()
+	if err != nil {
+		return Application{}, err
+	}
+
+	srv := grpc.NewServer(interceptors.NewServerInterceptors(telemeter, validator)...)
 	registerServices(srv, svc)
 
 	return Application{
