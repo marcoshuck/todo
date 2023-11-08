@@ -78,17 +78,17 @@ func Setup(cfg conf.ServerConfig) (Application, error) {
 }
 
 func registerServices(srv *grpc.Server, svc Services) {
-	tasksv1.RegisterTasksServiceServer(srv, svc.Tasks)
+	tasksv1.RegisterTasksWriterServiceServer(srv, svc.Tasks)
 	healthv1.RegisterHealthServer(srv, svc.Health)
 }
 
 // setupServices initializes the Application Services.
 func setupServices(db *gorm.DB, logger *zap.Logger, tracerProvider trace.TracerProvider, meterProvider metric.MeterProvider) Services {
 	logger.Debug("Initializing services")
-	tasksService := service.NewTasks(db, logger, meterProvider.Meter("todo.huck.com.ar/tasks"))
+	TasksWriterService := service.NewTasksWriter(db, logger, meterProvider.Meter("todo.huck.com.ar/tasks"))
 	healthService := health.NewServer()
 	return Services{
-		Tasks:  tasksService,
+		Tasks:  TasksWriterService,
 		Health: healthService,
 	}
 }

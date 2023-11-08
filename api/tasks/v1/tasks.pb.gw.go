@@ -31,7 +31,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
-func request_TasksService_CreateTask_0(ctx context.Context, marshaler runtime.Marshaler, client TasksServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_TasksWriterService_CreateTask_0(ctx context.Context, marshaler runtime.Marshaler, client TasksWriterServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq CreateTaskRequest
 	var metadata runtime.ServerMetadata
 
@@ -48,7 +48,7 @@ func request_TasksService_CreateTask_0(ctx context.Context, marshaler runtime.Ma
 
 }
 
-func local_request_TasksService_CreateTask_0(ctx context.Context, marshaler runtime.Marshaler, server TasksServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_TasksWriterService_CreateTask_0(ctx context.Context, marshaler runtime.Marshaler, server TasksWriterServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq CreateTaskRequest
 	var metadata runtime.ServerMetadata
 
@@ -65,13 +65,13 @@ func local_request_TasksService_CreateTask_0(ctx context.Context, marshaler runt
 
 }
 
-// RegisterTasksServiceHandlerServer registers the http handlers for service TasksService to "mux".
-// UnaryRPC     :call TasksServiceServer directly.
+// RegisterTasksWriterServiceHandlerServer registers the http handlers for service TasksWriterService to "mux".
+// UnaryRPC     :call TasksWriterServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterTasksServiceHandlerFromEndpoint instead.
-func RegisterTasksServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server TasksServiceServer) error {
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterTasksWriterServiceHandlerFromEndpoint instead.
+func RegisterTasksWriterServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server TasksWriterServiceServer) error {
 
-	mux.Handle("POST", pattern_TasksService_CreateTask_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_TasksWriterService_CreateTask_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -79,12 +79,12 @@ func RegisterTasksServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.tasks.v1.TasksService/CreateTask", runtime.WithHTTPPathPattern("/v1/tasks"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.tasks.v1.TasksWriterService/CreateTask", runtime.WithHTTPPathPattern("/v1/tasks"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_TasksService_CreateTask_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_TasksWriterService_CreateTask_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -92,16 +92,16 @@ func RegisterTasksServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			return
 		}
 
-		forward_TasksService_CreateTask_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_TasksWriterService_CreateTask_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
 	return nil
 }
 
-// RegisterTasksServiceHandlerFromEndpoint is same as RegisterTasksServiceHandler but
+// RegisterTasksWriterServiceHandlerFromEndpoint is same as RegisterTasksWriterServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterTasksServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterTasksWriterServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
@@ -121,41 +121,41 @@ func RegisterTasksServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.S
 		}()
 	}()
 
-	return RegisterTasksServiceHandler(ctx, mux, conn)
+	return RegisterTasksWriterServiceHandler(ctx, mux, conn)
 }
 
-// RegisterTasksServiceHandler registers the http handlers for service TasksService to "mux".
+// RegisterTasksWriterServiceHandler registers the http handlers for service TasksWriterService to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterTasksServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterTasksServiceHandlerClient(ctx, mux, NewTasksServiceClient(conn))
+func RegisterTasksWriterServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterTasksWriterServiceHandlerClient(ctx, mux, NewTasksWriterServiceClient(conn))
 }
 
-// RegisterTasksServiceHandlerClient registers the http handlers for service TasksService
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "TasksServiceClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "TasksServiceClient"
+// RegisterTasksWriterServiceHandlerClient registers the http handlers for service TasksWriterService
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "TasksWriterServiceClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "TasksWriterServiceClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "TasksServiceClient" to call the correct interceptors.
-func RegisterTasksServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client TasksServiceClient) error {
+// "TasksWriterServiceClient" to call the correct interceptors.
+func RegisterTasksWriterServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client TasksWriterServiceClient) error {
 
-	mux.Handle("POST", pattern_TasksService_CreateTask_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_TasksWriterService_CreateTask_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.tasks.v1.TasksService/CreateTask", runtime.WithHTTPPathPattern("/v1/tasks"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.tasks.v1.TasksWriterService/CreateTask", runtime.WithHTTPPathPattern("/v1/tasks"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_TasksService_CreateTask_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_TasksWriterService_CreateTask_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_TasksService_CreateTask_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_TasksWriterService_CreateTask_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -163,9 +163,9 @@ func RegisterTasksServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_TasksService_CreateTask_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "tasks"}, ""))
+	pattern_TasksWriterService_CreateTask_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "tasks"}, ""))
 )
 
 var (
-	forward_TasksService_CreateTask_0 = runtime.ForwardResponseMessage
+	forward_TasksWriterService_CreateTask_0 = runtime.ForwardResponseMessage
 )

@@ -19,91 +19,91 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	TasksService_CreateTask_FullMethodName = "/api.tasks.v1.TasksService/CreateTask"
+	TasksWriterService_CreateTask_FullMethodName = "/api.tasks.v1.TasksWriterService/CreateTask"
 )
 
-// TasksServiceClient is the client API for TasksService service.
+// TasksWriterServiceClient is the client API for TasksWriterService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type TasksServiceClient interface {
+type TasksWriterServiceClient interface {
 	// CreateTask creates a Task.
 	CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*Task, error)
 }
 
-type tasksServiceClient struct {
+type tasksWriterServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewTasksServiceClient(cc grpc.ClientConnInterface) TasksServiceClient {
-	return &tasksServiceClient{cc}
+func NewTasksWriterServiceClient(cc grpc.ClientConnInterface) TasksWriterServiceClient {
+	return &tasksWriterServiceClient{cc}
 }
 
-func (c *tasksServiceClient) CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*Task, error) {
+func (c *tasksWriterServiceClient) CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*Task, error) {
 	out := new(Task)
-	err := c.cc.Invoke(ctx, TasksService_CreateTask_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, TasksWriterService_CreateTask_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// TasksServiceServer is the server API for TasksService service.
-// All implementations must embed UnimplementedTasksServiceServer
+// TasksWriterServiceServer is the server API for TasksWriterService service.
+// All implementations must embed UnimplementedTasksWriterServiceServer
 // for forward compatibility
-type TasksServiceServer interface {
+type TasksWriterServiceServer interface {
 	// CreateTask creates a Task.
 	CreateTask(context.Context, *CreateTaskRequest) (*Task, error)
-	mustEmbedUnimplementedTasksServiceServer()
+	mustEmbedUnimplementedTasksWriterServiceServer()
 }
 
-// UnimplementedTasksServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedTasksServiceServer struct {
+// UnimplementedTasksWriterServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedTasksWriterServiceServer struct {
 }
 
-func (UnimplementedTasksServiceServer) CreateTask(context.Context, *CreateTaskRequest) (*Task, error) {
+func (UnimplementedTasksWriterServiceServer) CreateTask(context.Context, *CreateTaskRequest) (*Task, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTask not implemented")
 }
-func (UnimplementedTasksServiceServer) mustEmbedUnimplementedTasksServiceServer() {}
+func (UnimplementedTasksWriterServiceServer) mustEmbedUnimplementedTasksWriterServiceServer() {}
 
-// UnsafeTasksServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to TasksServiceServer will
+// UnsafeTasksWriterServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to TasksWriterServiceServer will
 // result in compilation errors.
-type UnsafeTasksServiceServer interface {
-	mustEmbedUnimplementedTasksServiceServer()
+type UnsafeTasksWriterServiceServer interface {
+	mustEmbedUnimplementedTasksWriterServiceServer()
 }
 
-func RegisterTasksServiceServer(s grpc.ServiceRegistrar, srv TasksServiceServer) {
-	s.RegisterService(&TasksService_ServiceDesc, srv)
+func RegisterTasksWriterServiceServer(s grpc.ServiceRegistrar, srv TasksWriterServiceServer) {
+	s.RegisterService(&TasksWriterService_ServiceDesc, srv)
 }
 
-func _TasksService_CreateTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _TasksWriterService_CreateTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateTaskRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TasksServiceServer).CreateTask(ctx, in)
+		return srv.(TasksWriterServiceServer).CreateTask(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TasksService_CreateTask_FullMethodName,
+		FullMethod: TasksWriterService_CreateTask_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TasksServiceServer).CreateTask(ctx, req.(*CreateTaskRequest))
+		return srv.(TasksWriterServiceServer).CreateTask(ctx, req.(*CreateTaskRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// TasksService_ServiceDesc is the grpc.ServiceDesc for TasksService service.
+// TasksWriterService_ServiceDesc is the grpc.ServiceDesc for TasksWriterService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var TasksService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "api.tasks.v1.TasksService",
-	HandlerType: (*TasksServiceServer)(nil),
+var TasksWriterService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "api.tasks.v1.TasksWriterService",
+	HandlerType: (*TasksWriterServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "CreateTask",
-			Handler:    _TasksService_CreateTask_Handler,
+			Handler:    _TasksWriterService_CreateTask_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
