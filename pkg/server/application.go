@@ -21,7 +21,7 @@ import (
 
 // Services groups all the services exposed by a single gRPC Server.
 type Services struct {
-	Tasks  tasksv1.TasksServiceServer
+	Tasks  tasksv1.TasksWriterServiceServer
 	Health *health.Server
 }
 

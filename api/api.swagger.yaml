@@ -3,7 +3,7 @@ info:
   title: api/tasks/v1/tasks.proto
   version: version not set
 tags:
-  - name: TasksService
+  - name: TasksWriterService
 consumes:
   - application/json
 produces:
@@ -12,7 +12,7 @@ paths:
   /v1/tasks:
     post:
       summary: CreateTask creates a Task.
-      operationId: TasksService_CreateTask
+      operationId: TasksWriterService_CreateTask
       responses:
         "200":
           description: A successful response.
@@ -32,7 +32,7 @@ paths:
             required:
               - task
       tags:
-        - TasksService
+        - TasksWriterService
 definitions:
   protobufAny:
     type: object

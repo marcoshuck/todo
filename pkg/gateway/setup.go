@@ -31,7 +31,7 @@ func Setup(ctx context.Context, cfg conf.GatewayConfig) (Gateway, error) {
 		interceptors.NewClientUnaryInterceptors(telemeter),
 		interceptors.NewClientStreamInterceptors(telemeter),
 	}
-	err = tasksv1.RegisterTasksServiceHandlerFromEndpoint(ctx, mux, cfg.ServerAddress, opts)
+	err = tasksv1.RegisterTasksWriterServiceHandlerFromEndpoint(ctx, mux, cfg.ServerAddress, opts)
 	if err != nil {
 		log.Fatalln("Failed to register tasks service:", err)
 	}

@@ -12,9 +12,9 @@ import (
 	"gorm.io/gorm"
 )
 
-// tasks implements tasksv1.TasksServiceServer.
+// tasks implements tasksv1.TasksWriterServiceServer.
 type tasks struct {
-	tasksv1.UnimplementedTasksServiceServer
+	tasksv1.UnimplementedTasksWriterServiceServer
 	db     *gorm.DB
 	logger *zap.Logger
 	meter  metric.Meter
@@ -42,9 +42,9 @@ func (svc *tasks) CreateTask(ctx context.Context, request *tasksv1.CreateTaskReq
 	return task.API(), nil
 }
 
-// NewTasks initializes a new tasksv1.TasksServiceServer implementation.
-func NewTasks(db *gorm.DB, logger *zap.Logger, meter metric.Meter) tasksv1.TasksServiceServer {
-	tasksLogger := logger.Named("service.tasks")
+// NewTasksWriter initializes a new tasksv1.TasksWriterServiceServer implementation.
+func NewTasksWriter(db *gorm.DB, logger *zap.Logger, meter metric.Meter) tasksv1.TasksWriterServiceServer {
+	tasksLogger := logger.Named("service.tasks.writer")
 	return &tasks{
 		db:     db,
 		logger: tasksLogger,

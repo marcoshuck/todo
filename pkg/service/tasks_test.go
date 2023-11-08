@@ -18,8 +18,8 @@ func TestTasksServiceSuite(t *testing.T) {
 
 type TasksServiceTestSuite struct {
 	suite.Suite
-	db  *gorm.DB
-	svc tasksv1.TasksServiceServer
+	db     *gorm.DB
+	writer tasksv1.TasksWriterServiceServer
 }
 
 func (suite *TasksServiceTestSuite) SetupSuite() {
@@ -32,7 +32,7 @@ func (suite *TasksServiceTestSuite) SetupTest() {
 	suite.Require().NoError(err)
 	suite.Require().NoError(suite.db.Migrator().AutoMigrate(&domain.Task{}))
 
-	suite.svc = NewTasks(suite.db, zap.NewNop(), noop.NewMeterProvider().Meter(""))
+	suite.writer = NewTasksWriter(suite.db, zap.NewNop(), noop.NewMeterProvider().Meter(""))
 }
 
 func (suite *TasksServiceTestSuite) TearDownTest() {
@@ -50,7 +50,7 @@ func (suite *TasksServiceTestSuite) TestCreate_Success() {
 	suite.Require().NoError(suite.db.Model(&domain.Task{}).Count(&before).Error)
 
 	const title = "test"
-	res, err := suite.svc.CreateTask(context.Background(), &tasksv1.CreateTaskRequest{
+	res, err := suite.writer.CreateTask(context.Background(), &tasksv1.CreateTaskRequest{
 		Task: &tasksv1.Task{
 			Title: title,
 		},
