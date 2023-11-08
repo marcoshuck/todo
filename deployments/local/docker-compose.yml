@@ -19,6 +19,7 @@ services:
     depends_on:
       - collector
       - db
+
   gateway:
     image: "marcoshuck/todo-gw"
     build:
@@ -37,6 +38,7 @@ services:
     depends_on:
       - app
       - collector
+
   db:
     image: mysql:8
     container_name: db
@@ -50,6 +52,7 @@ services:
       - db_data:/var/lib/mysql
     networks:
       - persistence
+
   jaeger:
     image: jaegertracing/all-in-one:latest
     container_name: jaeger
@@ -68,6 +71,7 @@ services:
       - COLLECTOR_OTLP_ENABLED=true
     networks:
       - monitoring
+
   prometheus:
     image: prom/prometheus
     container_name: prometheus
@@ -115,6 +119,46 @@ services:
       - jaeger
       - prometheus
 
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.0
+    container_name: logstash
+    environment:
+      discovery.seed_hosts: logstash
+      LS_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ports:
+      - "5000:5000/tcp"
+      - "5000:5000/udp"
+      - "5044:5044"
+      - "9600:9600"
+    depends_on:
+      - elasticsearch
+    networks:
+      - monitoring
+    command: logstash -f /usr/share/logstash/pipeline/logstash-nginx.config
+
+  kibana:
+    image: kibana:7.16.1
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - monitoring
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.14
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - monitoring
 
 networks:
   transport:
@@ -126,3 +170,5 @@ networks:
 volumes:
   db_data:
   prometheus_data:
+  logstash_data:
+  elasticsearch_data:
