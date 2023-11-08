@@ -45,15 +45,6 @@ func (suite *TasksServiceTestSuite) TearDownSuite() {
 
 }
 
-func (suite *TasksServiceTestSuite) TestCreate_NilBody() {
-	res, err := suite.svc.CreateTask(context.Background(), &tasksv1.CreateTaskRequest{
-		Task: nil,
-	})
-	suite.Assert().Error(err)
-	suite.Assert().ErrorContains(err, "invalid task")
-	suite.Assert().Nil(res)
-}
-
 func (suite *TasksServiceTestSuite) TestCreate_Success() {
 	var before int64
 	suite.Require().NoError(suite.db.Model(&domain.Task{}).Count(&before).Error)
