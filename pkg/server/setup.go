@@ -48,14 +48,13 @@ func Setup(cfg conf.ServerConfig) (Application, error) {
 		return Application{}, err
 	}
 
-	svc := setupServices(db, telemeter.Logger, telemeter.TracerProvider, telemeter.MeterProvider)
-
 	validator, err := protovalidate.New()
 	if err != nil {
 		return Application{}, err
 	}
 
 	srv := grpc.NewServer(interceptors.NewServerInterceptors(telemeter, validator)...)
+	svc := setupServices(db, telemeter.Logger, telemeter.TracerProvider, telemeter.MeterProvider)
 	registerServices(srv, svc)
 
 	return Application{
@@ -79,6 +78,7 @@ func Setup(cfg conf.ServerConfig) (Application, error) {
 
 func registerServices(srv *grpc.Server, svc Services) {
 	tasksv1.RegisterTasksWriterServiceServer(srv, svc.TasksWriter)
+	tasksv1.RegisterTasksReaderServiceServer(srv, svc.TasksReader)
 	healthv1.RegisterHealthServer(srv, svc.Health)
 }
 

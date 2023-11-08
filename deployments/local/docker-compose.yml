@@ -8,6 +8,7 @@ services:
     container_name: app
     ports:
       - "3030:3030"
+      - "3031:3031"
     restart: always
     env_file:
       - .env.common
