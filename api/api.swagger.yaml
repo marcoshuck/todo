@@ -4,6 +4,7 @@ info:
   version: version not set
 tags:
   - name: TasksWriterService
+  - name: TasksReaderService
 consumes:
   - application/json
 produces:
@@ -33,6 +34,27 @@ paths:
               - task
       tags:
         - TasksWriterService
+  /v1/tasks/{id}:
+    get:
+      summary: GetTask returns a Task.
+      operationId: TasksReaderService_GetTask
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1Task'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          format: int64
+      tags:
+        - TasksReaderService
 definitions:
   protobufAny:
     type: object

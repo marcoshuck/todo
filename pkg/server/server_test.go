@@ -49,5 +49,5 @@ func (suite *ServerTestSuite) TestSetup() {
 	suite.Assert().NotNil(app.logger)
 	suite.Assert().NotNil(app.server)
 	suite.Assert().NotNil(app.db)
-	suite.Assert().NotNil(app.services.Tasks)
+	suite.Assert().NotNil(app.services.TasksWriter)
 }

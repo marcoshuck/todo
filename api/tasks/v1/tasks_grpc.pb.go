@@ -109,3 +109,95 @@ var TasksWriterService_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "api/tasks/v1/tasks.proto",
 }
+
+const (
+	TasksReaderService_GetTask_FullMethodName = "/api.tasks.v1.TasksReaderService/GetTask"
+)
+
+// TasksReaderServiceClient is the client API for TasksReaderService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type TasksReaderServiceClient interface {
+	// GetTask returns a Task.
+	GetTask(ctx context.Context, in *GetTaskRequest, opts ...grpc.CallOption) (*Task, error)
+}
+
+type tasksReaderServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewTasksReaderServiceClient(cc grpc.ClientConnInterface) TasksReaderServiceClient {
+	return &tasksReaderServiceClient{cc}
+}
+
+func (c *tasksReaderServiceClient) GetTask(ctx context.Context, in *GetTaskRequest, opts ...grpc.CallOption) (*Task, error) {
+	out := new(Task)
+	err := c.cc.Invoke(ctx, TasksReaderService_GetTask_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// TasksReaderServiceServer is the server API for TasksReaderService service.
+// All implementations must embed UnimplementedTasksReaderServiceServer
+// for forward compatibility
+type TasksReaderServiceServer interface {
+	// GetTask returns a Task.
+	GetTask(context.Context, *GetTaskRequest) (*Task, error)
+	mustEmbedUnimplementedTasksReaderServiceServer()
+}
+
+// UnimplementedTasksReaderServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedTasksReaderServiceServer struct {
+}
+
+func (UnimplementedTasksReaderServiceServer) GetTask(context.Context, *GetTaskRequest) (*Task, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTask not implemented")
+}
+func (UnimplementedTasksReaderServiceServer) mustEmbedUnimplementedTasksReaderServiceServer() {}
+
+// UnsafeTasksReaderServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to TasksReaderServiceServer will
+// result in compilation errors.
+type UnsafeTasksReaderServiceServer interface {
+	mustEmbedUnimplementedTasksReaderServiceServer()
+}
+
+func RegisterTasksReaderServiceServer(s grpc.ServiceRegistrar, srv TasksReaderServiceServer) {
+	s.RegisterService(&TasksReaderService_ServiceDesc, srv)
+}
+
+func _TasksReaderService_GetTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TasksReaderServiceServer).GetTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TasksReaderService_GetTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TasksReaderServiceServer).GetTask(ctx, req.(*GetTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// TasksReaderService_ServiceDesc is the grpc.ServiceDesc for TasksReaderService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var TasksReaderService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "api.tasks.v1.TasksReaderService",
+	HandlerType: (*TasksReaderServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetTask",
+			Handler:    _TasksReaderService_GetTask_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "api/tasks/v1/tasks.proto",
+}

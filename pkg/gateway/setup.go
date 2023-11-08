@@ -35,6 +35,10 @@ func Setup(ctx context.Context, cfg conf.GatewayConfig) (Gateway, error) {
 	if err != nil {
 		log.Fatalln("Failed to register tasks service:", err)
 	}
+	err = tasksv1.RegisterTasksReaderServiceHandlerFromEndpoint(ctx, mux, cfg.ServerAddress, opts)
+	if err != nil {
+		log.Fatalln("Failed to register tasks service:", err)
+	}
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)

@@ -21,8 +21,9 @@ import (
 
 // Services groups all the services exposed by a single gRPC Server.
 type Services struct {
-	Tasks  tasksv1.TasksWriterServiceServer
-	Health *health.Server
+	TasksWriter tasksv1.TasksWriterServiceServer
+	TasksReader tasksv1.TasksReaderServiceServer
+	Health      *health.Server
 }
 
 // shutDowner holds a method to gracefully shut down a service or integration.
