@@ -21,8 +21,9 @@ import (
 
 // Services groups all the services exposed by a single gRPC Server.
 type Services struct {
-	Tasks  tasksv1.TasksWriterServiceServer
-	Health *health.Server
+	TasksWriter tasksv1.TasksWriterServiceServer
+	TasksReader tasksv1.TasksReaderServiceServer
+	Health      *health.Server
 }
 
 // shutDowner holds a method to gracefully shut down a service or integration.
@@ -55,6 +56,8 @@ type Application struct {
 func (app Application) Run() error {
 	go app.checkHealth()
 	go app.serveMetrics()
+
+	app.logger.Info("Running application")
 	return app.server.Serve(app.listener)
 }
 
@@ -78,6 +81,7 @@ func (app Application) Shutdown() error {
 }
 
 func (app Application) checkHealth() {
+	app.logger.Info("Running health service")
 	var state healthv1.HealthCheckResponse_ServingStatus
 	for {
 		state = healthv1.HealthCheckResponse_SERVING
@@ -97,7 +101,9 @@ func (app Application) checkHealth() {
 }
 
 func (app Application) serveMetrics() {
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", app.cfg.Port+1), promhttp.Handler()); err != nil {
+	port := app.cfg.Port + 1
+	app.logger.Info("Running metrics", zap.Int("metrics.port", port))
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), promhttp.Handler()); err != nil {
 		app.logger.Error("Failed while running metrics server", zap.Error(err))
 	}
 }

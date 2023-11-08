@@ -20,6 +20,7 @@ type TasksServiceTestSuite struct {
 	suite.Suite
 	db     *gorm.DB
 	writer tasksv1.TasksWriterServiceServer
+	reader tasksv1.TasksReaderServiceServer
 }
 
 func (suite *TasksServiceTestSuite) SetupSuite() {
@@ -33,6 +34,7 @@ func (suite *TasksServiceTestSuite) SetupTest() {
 	suite.Require().NoError(suite.db.Migrator().AutoMigrate(&domain.Task{}))
 
 	suite.writer = NewTasksWriter(suite.db, zap.NewNop(), noop.NewMeterProvider().Meter(""))
+	suite.reader = NewTasksReader(suite.db, zap.NewNop(), noop.NewMeterProvider().Meter(""))
 }
 
 func (suite *TasksServiceTestSuite) TearDownTest() {
@@ -63,4 +65,20 @@ func (suite *TasksServiceTestSuite) TestCreate_Success() {
 	suite.Require().NoError(suite.db.Model(&domain.Task{}).Count(&after).Error)
 	suite.NotEqual(before, after)
 	suite.Equal(before+1, after)
+}
+
+func (suite *TasksServiceTestSuite) TestGet_Success() {
+	ctx := context.Background()
+
+	expected, err := suite.writer.CreateTask(ctx, &tasksv1.CreateTaskRequest{
+		Task: &tasksv1.Task{
+			Title: "A test",
+		},
+	})
+	suite.Require().NoError(err)
+
+	response, err := suite.reader.GetTask(ctx, &tasksv1.GetTaskRequest{Id: expected.GetId()})
+	suite.Assert().NoError(err)
+
+	suite.Assert().Equal(expected.GetTitle(), response.GetTitle())
 }

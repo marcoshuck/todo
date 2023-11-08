@@ -49,3 +49,23 @@ service TasksWriterService {
     option (google.api.method_signature) = "task";
   };
 }
+
+message GetTaskRequest {
+  int64 id = 1  [
+    (buf.validate.field).int64.gt = 0,
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "todo.huck.com.ar/Task"
+    }];
+}
+
+// TasksReaderService holds the methods to obtain Tasks.
+service TasksReaderService {
+  // GetTask returns a Task.
+  rpc GetTask(GetTaskRequest) returns (Task) {
+    option (google.api.http) = {
+      get: "/v1/tasks/{id}";
+    };
+    option (google.api.method_signature) = "task";
+  };
+}

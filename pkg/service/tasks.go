@@ -15,9 +15,27 @@ import (
 // tasks implements tasksv1.TasksWriterServiceServer.
 type tasks struct {
 	tasksv1.UnimplementedTasksWriterServiceServer
+	tasksv1.UnimplementedTasksReaderServiceServer
 	db     *gorm.DB
 	logger *zap.Logger
 	meter  metric.Meter
+}
+
+func (svc *tasks) GetTask(ctx context.Context, request *tasksv1.GetTaskRequest) (*tasksv1.Task, error) {
+	svc.logger.Debug("Getting task by ID", zap.Int64("task.id", request.GetId()))
+	span := trace.SpanFromContext(ctx)
+	defer span.End()
+
+	var task domain.Task
+	span.AddEvent("Getting task from the database")
+	err := svc.db.Model(&domain.Task{}).WithContext(ctx).First(&task, request.GetId()).Error
+	if err != nil {
+		svc.logger.Error("Failed to get task", zap.Error(err))
+		span.RecordError(err)
+		return nil, status.Errorf(codes.Unavailable, "failed to create task")
+	}
+	svc.logger.Debug("Returning task", zap.Int64("task.id", request.GetId()), zap.String("task.title", task.Title))
+	return task.API(), nil
 }
 
 // CreateTask creates a Task.
@@ -45,6 +63,16 @@ func (svc *tasks) CreateTask(ctx context.Context, request *tasksv1.CreateTaskReq
 // NewTasksWriter initializes a new tasksv1.TasksWriterServiceServer implementation.
 func NewTasksWriter(db *gorm.DB, logger *zap.Logger, meter metric.Meter) tasksv1.TasksWriterServiceServer {
 	tasksLogger := logger.Named("service.tasks.writer")
+	return &tasks{
+		db:     db,
+		logger: tasksLogger,
+		meter:  meter,
+	}
+}
+
+// NewTasksReader initializes a new tasksv1.TasksWriterServiceServer implementation.
+func NewTasksReader(db *gorm.DB, logger *zap.Logger, meter metric.Meter) tasksv1.TasksReaderServiceServer {
+	tasksLogger := logger.Named("service.tasks.reader")
 	return &tasks{
 		db:     db,
 		logger: tasksLogger,
