@@ -5,6 +5,7 @@ import (
 	"errors"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
 	"github.com/marcoshuck/todo/pkg/domain"
+	fieldmask_utils "github.com/mennanov/fieldmask-utils"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
@@ -113,6 +114,30 @@ func (svc *tasks) UndeleteTask(ctx context.Context, request *tasksv1.UndeleteTas
 		return nil, err
 	}
 	return task, nil
+}
+
+func (svc *tasks) UpdateTask(ctx context.Context, request *tasksv1.UpdateTaskRequest) (*tasksv1.Task, error) {
+	_, err := svc.GetTask(ctx, &tasksv1.GetTaskRequest{Id: request.GetTask().GetId()})
+	if err != nil {
+		return nil, err
+	}
+	update := make(map[string]any)
+	mask, err := fieldmask_utils.MaskFromProtoFieldMask(request.GetUpdateMask(), func(s string) string {
+		return s
+	})
+	if err != nil {
+		return nil, err
+	}
+	err = fieldmask_utils.StructToMap(mask, request.GetTask(), update)
+	if err != nil {
+		return nil, err
+	}
+
+	err = svc.db.Model(&domain.Task{}).Where("id = ?", request.GetTask().GetId()).Updates(update).Error
+	if err != nil {
+		return nil, err
+	}
+	return svc.GetTask(ctx, &tasksv1.GetTaskRequest{Id: request.GetTask().GetId()})
 }
 
 // NewTasksWriter initializes a new tasksv1.TasksWriterServiceServer implementation.
