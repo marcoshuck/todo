@@ -38,6 +38,24 @@ message CreateTaskRequest {
   Task task = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
+message DeleteTaskRequest {
+  int64 id = 1  [
+    (buf.validate.field).int64.gt = 0,
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "todo.huck.com.ar/Task"
+    }];
+}
+
+message UndeleteTaskRequest {
+  int64 id = 1  [
+    (buf.validate.field).int64.gt = 0,
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "todo.huck.com.ar/Task"
+    }];
+}
+
 // TasksWriterService holds the methods to persist, modify and remove Tasks.
 service TasksWriterService {
   // CreateTask creates a Task.
@@ -48,6 +66,19 @@ service TasksWriterService {
     };
     option (google.api.method_signature) = "task";
   };
+  rpc DeleteTask(DeleteTaskRequest) returns (Task) {
+    option (google.api.http) = {
+      delete: "/v1/tasks/{id}";
+    };
+    option (google.api.method_signature) = "id";
+  }
+  rpc UndeleteTask(UndeleteTaskRequest) returns (Task) {
+    option (google.api.http) = {
+      post: "/v1/tasks:undelete";
+      body: "*"
+    };
+    option (google.api.method_signature) = "id";
+  }
 }
 
 message GetTaskRequest {
