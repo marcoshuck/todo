@@ -11,6 +11,30 @@ produces:
   - application/json
 paths:
   /v1/tasks:
+    get:
+      summary: ListTasks returns a list of Tasks.
+      operationId: TasksReaderService_ListTasks
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1ListTasksResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: pageSize
+          in: query
+          required: false
+          type: integer
+          format: int32
+        - name: pageToken
+          in: query
+          required: false
+          type: string
+      tags:
+        - TasksReaderService
     post:
       summary: CreateTask creates a Task.
       operationId: TasksWriterService_CreateTask
@@ -75,6 +99,16 @@ definitions:
         items:
           type: object
           $ref: '#/definitions/protobufAny'
+  v1ListTasksResponse:
+    type: object
+    properties:
+      tasks:
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/v1Task'
+      nextPageToken:
+        type: string
   v1Task:
     type: object
     properties:

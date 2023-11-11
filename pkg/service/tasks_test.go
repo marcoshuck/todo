@@ -7,6 +7,8 @@ import (
 	"github.com/stretchr/testify/suite"
 	"go.opentelemetry.io/otel/metric/noop"
 	"go.uber.org/zap"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"testing"
@@ -81,4 +83,47 @@ func (suite *TasksServiceTestSuite) TestGet_Success() {
 	suite.Assert().NoError(err)
 
 	suite.Assert().Equal(expected.GetTitle(), response.GetTitle())
+}
+
+func (suite *TasksServiceTestSuite) TestGet_NotFound() {
+	ctx := context.Background()
+
+	_, err := suite.reader.GetTask(ctx, &tasksv1.GetTaskRequest{Id: 199452})
+	suite.Assert().Error(err)
+	suite.Assert().ErrorIs(err, status.Error(codes.NotFound, "task not found"))
+}
+
+func (suite *TasksServiceTestSuite) TestList_Empty() {
+	ctx := context.Background()
+
+	response, err := suite.reader.ListTasks(ctx, &tasksv1.ListTasksRequest{
+		PageSize:  0,
+		PageToken: "",
+	})
+	suite.Assert().NoError(err)
+	suite.Assert().Empty(response.GetTasks())
+}
+
+func (suite *TasksServiceTestSuite) TestList_Success() {
+	ctx := context.Background()
+
+	for i := 0; i < 10; i++ {
+		_, err := suite.writer.CreateTask(ctx, &tasksv1.CreateTaskRequest{
+			Task: &tasksv1.Task{
+				Title: "A test",
+			},
+		})
+		suite.Require().NoError(err)
+	}
+
+	var expected int64
+	suite.Require().NoError(suite.db.Model(&domain.Task{}).Count(&expected).Error)
+
+	response, err := suite.reader.ListTasks(ctx, &tasksv1.ListTasksRequest{
+		PageSize:  0,
+		PageToken: "",
+	})
+	suite.Assert().NoError(err)
+	suite.Assert().NotEmpty(response.GetTasks())
+	suite.Assert().Len(response.GetTasks(), int(expected))
 }
