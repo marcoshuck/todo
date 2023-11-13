@@ -79,6 +79,45 @@ paths:
           format: int64
       tags:
         - TasksReaderService
+    delete:
+      operationId: TasksWriterService_DeleteTask
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1Task'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          format: int64
+      tags:
+        - TasksWriterService
+  /v1/tasks:undelete:
+    post:
+      operationId: TasksWriterService_UndeleteTask
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1Task'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1UndeleteTaskRequest'
+      tags:
+        - TasksWriterService
 definitions:
   protobufAny:
     type: object
@@ -131,3 +170,11 @@ definitions:
       updateTime:
         type: string
         format: date-time
+  v1UndeleteTaskRequest:
+    type: object
+    properties:
+      id:
+        type: string
+        format: int64
+    required:
+      - id

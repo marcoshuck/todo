@@ -127,3 +127,57 @@ func (suite *TasksServiceTestSuite) TestList_Success() {
 	suite.Assert().NotEmpty(response.GetTasks())
 	suite.Assert().Len(response.GetTasks(), int(expected))
 }
+
+func (suite *TasksServiceTestSuite) TestDelete_NotFound() {
+	ctx := context.Background()
+
+	_, err := suite.writer.DeleteTask(ctx, &tasksv1.DeleteTaskRequest{Id: 116644725})
+	suite.Assert().Error(err)
+	suite.Assert().ErrorIs(err, status.Error(codes.NotFound, "task not found"))
+}
+
+func (suite *TasksServiceTestSuite) TestDelete_Success() {
+	ctx := context.Background()
+
+	expected, err := suite.writer.CreateTask(ctx, &tasksv1.CreateTaskRequest{
+		Task: &tasksv1.Task{
+			Title: "A test",
+		},
+	})
+	suite.Require().NoError(err)
+
+	response, err := suite.writer.DeleteTask(ctx, &tasksv1.DeleteTaskRequest{Id: expected.GetId()})
+	suite.Assert().NoError(err)
+	suite.Assert().Equal(expected.GetTitle(), response.GetTitle())
+}
+
+func (suite *TasksServiceTestSuite) TestUndelete_Success() {
+	ctx := context.Background()
+
+	expected, err := suite.writer.CreateTask(ctx, &tasksv1.CreateTaskRequest{
+		Task: &tasksv1.Task{
+			Title: "A test",
+		},
+	})
+	suite.Require().NoError(err)
+
+	res, err := suite.reader.ListTasks(ctx, &tasksv1.ListTasksRequest{})
+	suite.Require().NoError(err)
+	before := len(res.GetTasks())
+
+	response, err := suite.writer.DeleteTask(ctx, &tasksv1.DeleteTaskRequest{Id: expected.GetId()})
+	suite.Require().NoError(err)
+
+	res, err = suite.reader.ListTasks(ctx, &tasksv1.ListTasksRequest{})
+	suite.Require().NoError(err)
+	after := len(res.GetTasks())
+	suite.Require().NotEqual(before, after)
+
+	task, err := suite.writer.UndeleteTask(ctx, &tasksv1.UndeleteTaskRequest{Id: response.GetId()})
+	suite.Assert().NoError(err)
+	suite.Assert().NotNil(task)
+
+	res, err = suite.reader.ListTasks(ctx, &tasksv1.ListTasksRequest{})
+	suite.Require().NoError(err)
+	suite.Require().Equal(before, len(res.GetTasks()))
+}

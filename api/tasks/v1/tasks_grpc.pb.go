@@ -19,7 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	TasksWriterService_CreateTask_FullMethodName = "/api.tasks.v1.TasksWriterService/CreateTask"
+	TasksWriterService_CreateTask_FullMethodName   = "/api.tasks.v1.TasksWriterService/CreateTask"
+	TasksWriterService_DeleteTask_FullMethodName   = "/api.tasks.v1.TasksWriterService/DeleteTask"
+	TasksWriterService_UndeleteTask_FullMethodName = "/api.tasks.v1.TasksWriterService/UndeleteTask"
 )
 
 // TasksWriterServiceClient is the client API for TasksWriterService service.
@@ -28,6 +30,8 @@ const (
 type TasksWriterServiceClient interface {
 	// CreateTask creates a Task.
 	CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*Task, error)
+	DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...grpc.CallOption) (*Task, error)
+	UndeleteTask(ctx context.Context, in *UndeleteTaskRequest, opts ...grpc.CallOption) (*Task, error)
 }
 
 type tasksWriterServiceClient struct {
@@ -47,12 +51,32 @@ func (c *tasksWriterServiceClient) CreateTask(ctx context.Context, in *CreateTas
 	return out, nil
 }
 
+func (c *tasksWriterServiceClient) DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...grpc.CallOption) (*Task, error) {
+	out := new(Task)
+	err := c.cc.Invoke(ctx, TasksWriterService_DeleteTask_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tasksWriterServiceClient) UndeleteTask(ctx context.Context, in *UndeleteTaskRequest, opts ...grpc.CallOption) (*Task, error) {
+	out := new(Task)
+	err := c.cc.Invoke(ctx, TasksWriterService_UndeleteTask_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TasksWriterServiceServer is the server API for TasksWriterService service.
 // All implementations must embed UnimplementedTasksWriterServiceServer
 // for forward compatibility
 type TasksWriterServiceServer interface {
 	// CreateTask creates a Task.
 	CreateTask(context.Context, *CreateTaskRequest) (*Task, error)
+	DeleteTask(context.Context, *DeleteTaskRequest) (*Task, error)
+	UndeleteTask(context.Context, *UndeleteTaskRequest) (*Task, error)
 	mustEmbedUnimplementedTasksWriterServiceServer()
 }
 
@@ -62,6 +86,12 @@ type UnimplementedTasksWriterServiceServer struct {
 
 func (UnimplementedTasksWriterServiceServer) CreateTask(context.Context, *CreateTaskRequest) (*Task, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTask not implemented")
+}
+func (UnimplementedTasksWriterServiceServer) DeleteTask(context.Context, *DeleteTaskRequest) (*Task, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteTask not implemented")
+}
+func (UnimplementedTasksWriterServiceServer) UndeleteTask(context.Context, *UndeleteTaskRequest) (*Task, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UndeleteTask not implemented")
 }
 func (UnimplementedTasksWriterServiceServer) mustEmbedUnimplementedTasksWriterServiceServer() {}
 
@@ -94,6 +124,42 @@ func _TasksWriterService_CreateTask_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TasksWriterService_DeleteTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TasksWriterServiceServer).DeleteTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TasksWriterService_DeleteTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TasksWriterServiceServer).DeleteTask(ctx, req.(*DeleteTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TasksWriterService_UndeleteTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UndeleteTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TasksWriterServiceServer).UndeleteTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TasksWriterService_UndeleteTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TasksWriterServiceServer).UndeleteTask(ctx, req.(*UndeleteTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TasksWriterService_ServiceDesc is the grpc.ServiceDesc for TasksWriterService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -104,6 +170,14 @@ var TasksWriterService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateTask",
 			Handler:    _TasksWriterService_CreateTask_Handler,
+		},
+		{
+			MethodName: "DeleteTask",
+			Handler:    _TasksWriterService_DeleteTask_Handler,
+		},
+		{
+			MethodName: "UndeleteTask",
+			Handler:    _TasksWriterService_UndeleteTask_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -89,6 +89,32 @@ func (svc *tasks) CreateTask(ctx context.Context, request *tasksv1.CreateTaskReq
 	return task.API(), nil
 }
 
+// DeleteTask deletes a task.
+func (svc *tasks) DeleteTask(ctx context.Context, request *tasksv1.DeleteTaskRequest) (*tasksv1.Task, error) {
+	task, err := svc.GetTask(ctx, &tasksv1.GetTaskRequest{Id: request.GetId()})
+	if err != nil {
+		return nil, err
+	}
+	err = svc.db.Model(&domain.Task{}).Delete(&domain.Task{}, task.GetId()).Error
+	if err != nil {
+		return nil, status.Errorf(codes.Unavailable, "failed to delete task")
+	}
+	return task, nil
+}
+
+// UndeleteTask undeletes a task. Opposite operation to DeleteTask.
+func (svc *tasks) UndeleteTask(ctx context.Context, request *tasksv1.UndeleteTaskRequest) (*tasksv1.Task, error) {
+	err := svc.db.Model(&domain.Task{}).Unscoped().Where("id = ?", request.GetId()).Update("deleted_at", nil).Error
+	if err != nil {
+		return nil, status.Error(codes.Unavailable, "failed to undelete task")
+	}
+	task, err := svc.GetTask(ctx, &tasksv1.GetTaskRequest{Id: request.GetId()})
+	if err != nil {
+		return nil, err
+	}
+	return task, nil
+}
+
 // NewTasksWriter initializes a new tasksv1.TasksWriterServiceServer implementation.
 func NewTasksWriter(db *gorm.DB, logger *zap.Logger, meter metric.Meter) tasksv1.TasksWriterServiceServer {
 	tasksLogger := logger.Named("service.tasks.writer")
