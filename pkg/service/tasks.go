@@ -115,6 +115,23 @@ func (svc *tasks) UndeleteTask(ctx context.Context, request *tasksv1.UndeleteTas
 	return task, nil
 }
 
+// UpdateTask updates a task.
+func (svc *tasks) UpdateTask(ctx context.Context, request *tasksv1.UpdateTaskRequest) (*tasksv1.Task, error) {
+	_, err := svc.GetTask(ctx, &tasksv1.GetTaskRequest{Id: request.GetTask().GetId()})
+	if err != nil {
+		return nil, err
+	}
+
+	var task domain.Task
+	task.FromAPI(request.GetTask())
+	m := task.ApplyMask(request.GetUpdateMask())
+	err = svc.db.Model(&domain.Task{}).Where("id = ?", request.GetTask().GetId()).Updates(m).Error
+	if err != nil {
+		return nil, err
+	}
+	return svc.GetTask(ctx, &tasksv1.GetTaskRequest{Id: request.GetTask().GetId()})
+}
+
 // NewTasksWriter initializes a new tasksv1.TasksWriterServiceServer implementation.
 func NewTasksWriter(db *gorm.DB, logger *zap.Logger, meter metric.Meter) tasksv1.TasksWriterServiceServer {
 	tasksLogger := logger.Named("service.tasks.writer")
