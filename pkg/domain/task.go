@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
 	"github.com/marcoshuck/todo/pkg/serializer"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gopkg.in/yaml.v3"
 	"gorm.io/gorm"
@@ -79,4 +80,31 @@ func (t *Task) YAML() ([]byte, error) {
 // FromYAML converts a slice of bytes in YAML format to a Task.
 func (t *Task) FromYAML(data []byte) error {
 	return yaml.Unmarshal(data, t)
+}
+
+// ApplyMask returns the Map of the current Task with the given mask applied.
+func (t *Task) ApplyMask(mask *fieldmaskpb.FieldMask) map[string]any {
+	m := t.Map()
+	mask.Normalize()
+	for _, p := range mask.GetPaths() {
+		_, ok := m[p]
+		if !ok {
+			delete(m, p)
+		}
+	}
+	return m
+}
+
+// Map converts the current Task to a map.
+func (t *Task) Map() map[string]any {
+	b, err := t.JSON()
+	if err != nil {
+		return nil
+	}
+	m := make(map[string]any)
+	err = json.Unmarshal(b, &m)
+	if err != nil {
+		return nil
+	}
+	return m
 }

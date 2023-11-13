@@ -203,6 +203,8 @@ func (suite *TasksServiceTestSuite) TestUpdate_Success() {
 	suite.Assert().NoError(err)
 
 	suite.Assert().NotEqual(before.GetTitle(), after.GetTitle())
+	suite.Assert().Equal(before.GetId(), after.GetId())
+	suite.Assert().Equal(before.GetDescription(), after.GetDescription())
 
 	final, err := suite.reader.GetTask(ctx, &tasksv1.GetTaskRequest{Id: before.GetId()})
 	suite.Require().NoError(err)
