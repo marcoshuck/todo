@@ -59,6 +59,24 @@ message GetTaskRequest {
     }];
 }
 
+message ListTasksRequest {
+  reserved 1;
+  reserved "parent";
+
+  int32 page_size = 2 [
+    (buf.validate.field).int32.gt = 0,
+    (google.api.field_behavior) = OPTIONAL
+  ];
+  string page_token = 3 [
+    (google.api.field_behavior) = OPTIONAL
+  ];
+}
+
+message ListTasksResponse {
+  repeated Task tasks = 1;
+  string next_page_token = 2;
+}
+
 // TasksReaderService holds the methods to obtain Tasks.
 service TasksReaderService {
   // GetTask returns a Task.
@@ -67,5 +85,12 @@ service TasksReaderService {
       get: "/v1/tasks/{id}";
     };
     option (google.api.method_signature) = "task";
+  };
+
+  // ListTasks returns a list of Tasks.
+  rpc ListTasks(ListTasksRequest) returns (ListTasksResponse) {
+    option (google.api.http) = {
+      get: "/v1/tasks";
+    };
   };
 }

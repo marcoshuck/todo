@@ -111,7 +111,8 @@ var TasksWriterService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	TasksReaderService_GetTask_FullMethodName = "/api.tasks.v1.TasksReaderService/GetTask"
+	TasksReaderService_GetTask_FullMethodName   = "/api.tasks.v1.TasksReaderService/GetTask"
+	TasksReaderService_ListTasks_FullMethodName = "/api.tasks.v1.TasksReaderService/ListTasks"
 )
 
 // TasksReaderServiceClient is the client API for TasksReaderService service.
@@ -120,6 +121,8 @@ const (
 type TasksReaderServiceClient interface {
 	// GetTask returns a Task.
 	GetTask(ctx context.Context, in *GetTaskRequest, opts ...grpc.CallOption) (*Task, error)
+	// ListTasks returns a list of Tasks.
+	ListTasks(ctx context.Context, in *ListTasksRequest, opts ...grpc.CallOption) (*ListTasksResponse, error)
 }
 
 type tasksReaderServiceClient struct {
@@ -139,12 +142,23 @@ func (c *tasksReaderServiceClient) GetTask(ctx context.Context, in *GetTaskReque
 	return out, nil
 }
 
+func (c *tasksReaderServiceClient) ListTasks(ctx context.Context, in *ListTasksRequest, opts ...grpc.CallOption) (*ListTasksResponse, error) {
+	out := new(ListTasksResponse)
+	err := c.cc.Invoke(ctx, TasksReaderService_ListTasks_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TasksReaderServiceServer is the server API for TasksReaderService service.
 // All implementations must embed UnimplementedTasksReaderServiceServer
 // for forward compatibility
 type TasksReaderServiceServer interface {
 	// GetTask returns a Task.
 	GetTask(context.Context, *GetTaskRequest) (*Task, error)
+	// ListTasks returns a list of Tasks.
+	ListTasks(context.Context, *ListTasksRequest) (*ListTasksResponse, error)
 	mustEmbedUnimplementedTasksReaderServiceServer()
 }
 
@@ -154,6 +168,9 @@ type UnimplementedTasksReaderServiceServer struct {
 
 func (UnimplementedTasksReaderServiceServer) GetTask(context.Context, *GetTaskRequest) (*Task, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTask not implemented")
+}
+func (UnimplementedTasksReaderServiceServer) ListTasks(context.Context, *ListTasksRequest) (*ListTasksResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListTasks not implemented")
 }
 func (UnimplementedTasksReaderServiceServer) mustEmbedUnimplementedTasksReaderServiceServer() {}
 
@@ -186,6 +203,24 @@ func _TasksReaderService_GetTask_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TasksReaderService_ListTasks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListTasksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TasksReaderServiceServer).ListTasks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TasksReaderService_ListTasks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TasksReaderServiceServer).ListTasks(ctx, req.(*ListTasksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TasksReaderService_ServiceDesc is the grpc.ServiceDesc for TasksReaderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -196,6 +231,10 @@ var TasksReaderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetTask",
 			Handler:    _TasksReaderService_GetTask_Handler,
+		},
+		{
+			MethodName: "ListTasks",
+			Handler:    _TasksReaderService_ListTasks_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
