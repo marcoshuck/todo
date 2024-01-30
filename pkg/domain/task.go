@@ -2,8 +2,11 @@ package domain
 
 import (
 	"encoding/json"
+	"errors"
+	"github.com/golang/protobuf/protoc-gen-go/generator"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
 	"github.com/marcoshuck/todo/pkg/serializer"
+	fieldmask_utils "github.com/mennanov/fieldmask-utils"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gopkg.in/yaml.v3"
@@ -83,16 +86,20 @@ func (t *Task) FromYAML(data []byte) error {
 }
 
 // ApplyMask returns the Map of the current Task with the given mask applied.
-func (t *Task) ApplyMask(mask *fieldmaskpb.FieldMask) map[string]any {
-	m := t.Map()
+func (t *Task) ApplyMask(mask *fieldmaskpb.FieldMask) (map[string]any, error) {
 	mask.Normalize()
-	for _, p := range mask.GetPaths() {
-		_, ok := m[p]
-		if !ok {
-			delete(m, p)
-		}
+	if !mask.IsValid(t.API()) {
+		return nil, errors.New("invalid mask")
 	}
-	return m
+	protoMask, err := fieldmask_utils.MaskFromProtoFieldMask(mask, generator.CamelCase)
+	if err != nil {
+		return nil, err
+	}
+	m := make(map[string]any)
+	if err = fieldmask_utils.StructToMap(protoMask, t.API(), m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 // Map converts the current Task to a map.
