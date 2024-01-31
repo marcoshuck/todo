@@ -3,7 +3,7 @@ package domain
 import (
 	"encoding/json"
 	"errors"
-	"github.com/golang/protobuf/protoc-gen-go/generator"
+	"github.com/gojaguar/jaguar/strings"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
 	"github.com/marcoshuck/todo/pkg/serializer"
 	fieldmask_utils "github.com/mennanov/fieldmask-utils"
@@ -91,7 +91,7 @@ func (t *Task) ApplyMask(mask *fieldmaskpb.FieldMask) (map[string]any, error) {
 	if !mask.IsValid(t.API()) {
 		return nil, errors.New("invalid mask")
 	}
-	protoMask, err := fieldmask_utils.MaskFromProtoFieldMask(mask, generator.CamelCase)
+	protoMask, err := fieldmask_utils.MaskFromProtoFieldMask(mask, strings.PascalCase)
 	if err != nil {
 		return nil, err
 	}
