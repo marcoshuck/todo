@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {createTask, deleteTask, getTask} from "./tasks.utils";
+import {createTask, deleteTask, getTask, undeleteTask} from "./tasks.utils";
 
 
 test('POST /v1/tasks', async ({request}) => {
@@ -54,7 +54,35 @@ test('DELETE /v1/tasks/:id', async ({request}) => {
     // Delete the task
     await deleteTask(request, output.id);
 
-    response = await request.get(`/v1/tasks/${expected.id}`)
+    response = await request.get(`/v1/tasks/${output.id}`)
     expect(response.ok()).toBeFalsy();
     expect(response.status()).toEqual(404);
+})
+
+test('POST /v1/tasks:undelete', async ({request}) => {
+    let input = {
+        title: 'An awesome task',
+        description: 'An awesome description for an awesome task',
+    };
+
+    let expected = await createTask(request, input);
+
+    // Get the task
+    let {data: output, response} = await getTask(request, expected.id);
+    expect(response.ok()).toBeTruthy();
+
+    // Delete the task
+    await deleteTask(request, output.id);
+
+    // It does not exist, hence not found
+    response = await request.get(`/v1/tasks/${output.id}`)
+    expect(response.ok()).toBeFalsy();
+    expect(response.status()).toEqual(404);
+
+    // But if we undelete
+    await undeleteTask(request, output.id);
+
+    // We rever the state back to found
+    response = await request.get(`/v1/tasks/${output.id}`)
+    expect(response.ok()).toBeTruthy();
 })
