@@ -11,6 +11,7 @@ import (
 	"github.com/marcoshuck/todo/pkg/interceptors"
 	"github.com/marcoshuck/todo/pkg/telemetry"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
@@ -30,6 +31,13 @@ func Setup(ctx context.Context, cfg conf.GatewayConfig) (Gateway, error) {
 		grpc.WithBlock(),
 		interceptors.NewClientUnaryInterceptors(telemeter),
 		interceptors.NewClientStreamInterceptors(telemeter),
+		grpc.WithStatsHandler(
+			otelgrpc.NewClientHandler(
+				otelgrpc.WithTracerProvider(telemeter.TracerProvider),
+				otelgrpc.WithMeterProvider(telemeter.MeterProvider),
+				otelgrpc.WithPropagators(telemeter.Propagator),
+			),
+		),
 	}
 	err = tasksv1.RegisterTasksWriterServiceHandlerFromEndpoint(ctx, mux, cfg.ServerAddress, opts)
 	if err != nil {
