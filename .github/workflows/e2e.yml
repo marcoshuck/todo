@@ -1,10 +1,6 @@
 name: E2E Tests
 on:
   push:
-    pull_request:
-      - main
-    tags:
-      - v*
 jobs:
   test:
     timeout-minutes: 10
