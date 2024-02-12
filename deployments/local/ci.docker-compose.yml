@@ -1,0 +1,56 @@
+version: "3.9"
+services:
+  app:
+    image: "ghcr.io/marcoshuck/todo/app:latest"
+    build:
+      context: ../..
+      dockerfile: build/app.Dockerfile
+    container_name: app
+    ports:
+      - "3030:3030"
+      - "3031:3031"
+    restart: unless-stopped
+    env_file:
+      - .env.ci
+    networks:
+      - transport
+      - persistence
+    depends_on:
+      - db
+  gateway:
+    image: "ghcr.io/marcoshuck/todo/gateway:latest"
+    build:
+      context: ../..
+      dockerfile: build/gateway.Dockerfile
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    env_file:
+      - .env.ci
+    environment:
+      - APPLICATION_PORT=8080
+    networks:
+      - transport
+    depends_on:
+      - app
+  db:
+    image: mysql:8
+    container_name: db
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
+    env_file:
+      - .env.ci
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - persistence
+
+networks:
+  transport:
+    name: "transport"
+  persistence:
+    name: "persistence"
+volumes:
+  db_data:
