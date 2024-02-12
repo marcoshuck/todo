@@ -1,5 +1,6 @@
 import {expect, test} from '@playwright/test';
-import {Task} from '../gen/typescript/api/tasks/v1/tasks_pb';
+import {createTask, deleteTask, getTask} from "./tasks.utils";
+
 
 test('POST /v1/tasks', async ({request}) => {
     let input = {
@@ -7,14 +8,9 @@ test('POST /v1/tasks', async ({request}) => {
         description: 'An awesome description for an awesome task',
     };
 
-    const response = await request.post('/v1/tasks', {
-        data: input,
-    });
-    expect(response.ok()).toBeTruthy();
+    let output = await createTask(request, input);
 
-    const body = await response.body();
-    const output: Task = Task.fromJsonString(body.toString());
-
+    // Assertions
     expect(output.title).toEqual(input.title);
     expect(output.description).toEqual(input.description);
     expect(output.id).toBeGreaterThan(0);
@@ -28,21 +24,37 @@ test('GET /v1/tasks/:id', async ({request}) => {
         description: 'An awesome description for an awesome task',
     };
 
-    const created = await request.post('/v1/tasks', {
-        data: input,
-    });
-    expect(created.ok()).toBeTruthy();
+    let expected = await createTask(request, input);
 
-    let body = await created.body();
-    const expected: Task = Task.fromJsonString(body.toString());
 
-    const response = await request.get(`/v1/tasks/${expected.id}`)
-    body = await response.body();
-    const output: Task = Task.fromJsonString(body.toString());
+    // Get the data
+    const {data: output, response} = await getTask(request, expected.id);
+    expect(response.ok()).toBeTruthy();
 
+    // Assertions
     expect(output.title).toEqual(expected.title);
     expect(output.description).toEqual(expected.description);
     expect(output.id).toEqual(expected.id);
     expect(output.createTime).toEqual(expected.createTime);
     expect(output.updateTime).toEqual(expected.updateTime);
+})
+
+test('DELETE /v1/tasks/:id', async ({request}) => {
+    let input = {
+        title: 'An awesome task',
+        description: 'An awesome description for an awesome task',
+    };
+
+    let expected = await createTask(request, input);
+
+    // Get the task
+    let {data: output, response} = await getTask(request, expected.id);
+    expect(response.ok()).toBeTruthy();
+
+    // Delete the task
+    await deleteTask(request, output.id);
+
+    response = await request.get(`/v1/tasks/${expected.id}`)
+    expect(response.ok()).toBeFalsy();
+    expect(response.status()).toEqual(404);
 })
