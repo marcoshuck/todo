@@ -82,22 +82,22 @@ func (app Application) Shutdown() error {
 
 func (app Application) checkHealth() {
 	app.logger.Info("Running health service")
-	var state healthv1.HealthCheckResponse_ServingStatus
 	for {
-		state = healthv1.HealthCheckResponse_SERVING
-
-		db, err := app.db.DB()
-		if err != nil {
-			state = healthv1.HealthCheckResponse_NOT_SERVING
-		}
-		if err = db.Ping(); err != nil {
-			state = healthv1.HealthCheckResponse_NOT_SERVING
-		}
-
-		app.services.Health.SetServingStatus("", state)
-
+		app.services.Health.SetServingStatus("app.db", app.checkDatabaseHealth())
 		time.Sleep(10 * time.Second)
 	}
+}
+
+func (app Application) checkDatabaseHealth() healthv1.HealthCheckResponse_ServingStatus {
+	state := healthv1.HealthCheckResponse_SERVING
+	db, err := app.db.DB()
+	if err != nil {
+		state = healthv1.HealthCheckResponse_NOT_SERVING
+	}
+	if err = db.Ping(); err != nil {
+		state = healthv1.HealthCheckResponse_NOT_SERVING
+	}
+	return state
 }
 
 func (app Application) serveMetrics() {

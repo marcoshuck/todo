@@ -53,7 +53,7 @@ func Setup(ctx context.Context, cfg conf.GatewayConfig) (Gateway, error) {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
-	r.Use(middleware.Heartbeat("/healthz"))
+	r.Use(middleware.Heartbeat("/livez"))
 	r.Use(cors.Handler(cors.Options{
 		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
 		AllowedOrigins: []string{"https://*", "http://*"},
