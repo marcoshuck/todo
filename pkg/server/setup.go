@@ -61,7 +61,7 @@ func Setup(cfg conf.ServerConfig) (Application, error) {
 	registerServices(srv, svc)
 
 	metricsServer := &http.Server{
-		Addr:    fmt.Sprintf(":%d"),
+		Addr:    fmt.Sprintf(":%d", cfg.Port+1),
 		Handler: promhttp.Handler(),
 	}
 
