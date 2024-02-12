@@ -13,10 +13,11 @@ test('POST /v1/tasks', async ({request}) => {
     expect(response.ok()).toBeTruthy();
 
     const body = await response.body();
-    const output: Task = Task.fromBinary(body);
+    const output: Task = Task.fromJsonString(body.toString());
 
     expect(output.title).toEqual(input.title);
     expect(output.description).toEqual(input.description);
+    expect(output.id).toBeGreaterThan(0);
     expect(output.createTime).not.toBeNull();
     expect(output.updateTime).not.toBeNull();
 })
