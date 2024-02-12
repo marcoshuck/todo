@@ -2,6 +2,7 @@ package server
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/bufbuild/protovalidate-go"
 	"github.com/gojaguar/jaguar/database"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
@@ -10,6 +11,7 @@ import (
 	"github.com/marcoshuck/todo/pkg/interceptors"
 	"github.com/marcoshuck/todo/pkg/service"
 	"github.com/marcoshuck/todo/pkg/telemetry"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/uptrace/opentelemetry-go-extra/otelgorm"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
@@ -21,6 +23,7 @@ import (
 	"gorm.io/gorm"
 	"io"
 	"net"
+	"net/http"
 )
 
 // Setup creates a new application using the given ServerConfig.
@@ -57,6 +60,11 @@ func Setup(cfg conf.ServerConfig) (Application, error) {
 	svc := setupServices(db, telemeter.Logger, telemeter.TracerProvider, telemeter.MeterProvider)
 	registerServices(srv, svc)
 
+	metricsServer := &http.Server{
+		Addr:    fmt.Sprintf(":%d"),
+		Handler: promhttp.Handler(),
+	}
+
 	return Application{
 		server:         srv,
 		listener:       l,
@@ -65,12 +73,14 @@ func Setup(cfg conf.ServerConfig) (Application, error) {
 		meterProvider:  telemeter.MeterProvider,
 		db:             db,
 		services:       svc,
+		metricsServer:  metricsServer,
 		shutdown: []shutDowner{
 			telemeter.TraceExporter,
 			telemeter.MeterExporter,
 		},
 		closer: []io.Closer{
 			dbConn,
+			metricsServer,
 		},
 		cfg: cfg,
 	}, nil
