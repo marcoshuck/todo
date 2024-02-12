@@ -24,3 +24,6 @@ go.work
 
 # IDEs
 .idea/
+
+# Protocol buffers stubs
+gen/
