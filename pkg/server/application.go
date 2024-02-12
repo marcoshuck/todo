@@ -2,10 +2,8 @@ package server
 
 import (
 	"context"
-	"fmt"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
 	"github.com/marcoshuck/todo/pkg/conf"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/multierr"
@@ -50,11 +48,12 @@ type Application struct {
 	shutdown       []shutDowner
 	closer         []io.Closer
 	cfg            conf.ServerConfig
+	metricsServer  *http.Server
 }
 
 // Run serves the application services.
-func (app Application) Run() error {
-	go app.checkHealth()
+func (app Application) Run(ctx context.Context) error {
+	go app.checkHealth(ctx)
 	go app.serveMetrics()
 
 	app.logger.Info("Running application")
@@ -62,8 +61,7 @@ func (app Application) Run() error {
 }
 
 // Shutdown releases any held resources by dependencies of this Application.
-func (app Application) Shutdown() error {
-	ctx := context.Background()
+func (app Application) Shutdown(ctx context.Context) error {
 	var err error
 	for _, downer := range app.shutdown {
 		if downer == nil {
@@ -80,10 +78,13 @@ func (app Application) Shutdown() error {
 	return err
 }
 
-func (app Application) checkHealth() {
+func (app Application) checkHealth(ctx context.Context) {
 	app.logger.Info("Running health service")
 	var state healthv1.HealthCheckResponse_ServingStatus
 	for {
+		if ctx.Err() != nil {
+			return
+		}
 		state = healthv1.HealthCheckResponse_SERVING
 
 		db, err := app.db.DB()
@@ -101,9 +102,7 @@ func (app Application) checkHealth() {
 }
 
 func (app Application) serveMetrics() {
-	port := app.cfg.Port + 1
-	app.logger.Info("Running metrics", zap.Int("metrics.port", port))
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), promhttp.Handler()); err != nil {
-		app.logger.Error("Failed while running metrics server", zap.Error(err))
+	if err := app.metricsServer.ListenAndServe(); err != nil {
+		app.logger.Error("failed to listen and server to metrics server", zap.Error(err))
 	}
 }
