@@ -124,7 +124,10 @@ func (svc *tasks) UpdateTask(ctx context.Context, request *tasksv1.UpdateTaskReq
 
 	var task domain.Task
 	task.FromAPI(request.GetTask())
-	m := task.ApplyMask(request.GetUpdateMask())
+	m, err := task.ApplyMask(request.GetUpdateMask())
+	if err != nil {
+		return nil, err
+	}
 	err = svc.db.Model(&domain.Task{}).Where("id = ?", request.GetTask().GetId()).Updates(m).Error
 	if err != nil {
 		return nil, err
