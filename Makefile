@@ -36,7 +36,7 @@ ci/compose-up:
 	docker-compose -f ./deployments/local/ci.docker-compose.yml up -d --build
 
 ci/compose-down:
-	docker-compose -f ./deployments/local/ci.docker-compose.yml down
+	docker-compose -f ./deployments/local/ci.docker-compose.yml down --rmi all
 
 test-e2e:
 	npx playwright test

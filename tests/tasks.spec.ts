@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {createTask, deleteTask, getTask, undeleteTask} from "./tasks.utils";
+import {createTask, deleteTask, getTask, undeleteTask, updateTask} from "./tasks.utils";
 
 
 test('POST /v1/tasks', async ({request}) => {
@@ -85,4 +85,28 @@ test('POST /v1/tasks:undelete', async ({request}) => {
     // We rever the state back to found
     response = await request.get(`/v1/tasks/${output.id}`)
     expect(response.ok()).toBeTruthy();
+})
+
+test('PATCH /v1/tasks/:id', async ({request}) => {
+    let input = {
+        title: 'An awesome task',
+        description: 'An awesome description for an awesome task',
+    };
+
+    let expected = await createTask(request, input);
+
+    // Get the task
+    let {data: output, response} = await getTask(request, expected.id);
+    expect(response.ok()).toBeTruthy();
+
+    // Partially update a task
+    const patch = {
+        id: Number(output.id),
+        description: 'A modified description for an awesome task'
+    }
+    await updateTask(request, output.id, patch);
+
+    ({data: output, response} = await getTask(request, expected.id));
+    expect(response.ok()).toBeTruthy();
+    expect(output.description).toEqual(patch.description);
 })
