@@ -4,7 +4,6 @@ import (
 	grpc_logging "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
 	"github.com/marcoshuck/todo/pkg/telemetry"
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"time"
@@ -12,11 +11,6 @@ import (
 
 func NewClientUnaryInterceptors(telemeter telemetry.Telemetry) grpc.DialOption {
 	return grpc.WithChainUnaryInterceptor(
-		otelgrpc.UnaryClientInterceptor(
-			otelgrpc.WithTracerProvider(telemeter.TracerProvider),
-			otelgrpc.WithMeterProvider(telemeter.MeterProvider),
-			otelgrpc.WithPropagators(telemeter.Propagator),
-		),
 		grpc_logging.UnaryClientInterceptor(interceptorLogger(telemeter.Logger)),
 		retry.UnaryClientInterceptor(
 			retry.WithCodes(codes.ResourceExhausted, codes.Unavailable),
@@ -28,11 +22,6 @@ func NewClientUnaryInterceptors(telemeter telemetry.Telemetry) grpc.DialOption {
 
 func NewClientStreamInterceptors(telemeter telemetry.Telemetry) grpc.DialOption {
 	return grpc.WithChainStreamInterceptor(
-		otelgrpc.StreamClientInterceptor(
-			otelgrpc.WithTracerProvider(telemeter.TracerProvider),
-			otelgrpc.WithMeterProvider(telemeter.MeterProvider),
-			otelgrpc.WithPropagators(telemeter.Propagator),
-		),
 		grpc_logging.StreamClientInterceptor(interceptorLogger(telemeter.Logger)),
 		retry.StreamClientInterceptor(
 			retry.WithCodes(codes.ResourceExhausted, codes.Unavailable),

@@ -12,17 +12,21 @@ import (
 
 func NewServerInterceptors(telemeter telemetry.Telemetry, validator *protovalidate.Validator) []grpc.ServerOption {
 	var opts []grpc.ServerOption
-	return append(opts, newServerUnaryInterceptors(telemeter, validator), newServerStreamInterceptors(telemeter, validator))
+	return append(opts,
+		newServerUnaryInterceptors(telemeter, validator),
+		newServerStreamInterceptors(telemeter, validator),
+		grpc.StatsHandler(
+			otelgrpc.NewServerHandler(
+				otelgrpc.WithTracerProvider(telemeter.TracerProvider),
+				otelgrpc.WithMeterProvider(telemeter.MeterProvider),
+				otelgrpc.WithPropagators(telemeter.Propagator),
+			),
+		),
+	)
 }
 
 func newServerUnaryInterceptors(telemeter telemetry.Telemetry, validator *protovalidate.Validator) grpc.ServerOption {
 	var interceptors []grpc.UnaryServerInterceptor
-
-	interceptors = append(interceptors, otelgrpc.UnaryServerInterceptor(
-		otelgrpc.WithTracerProvider(telemeter.TracerProvider),
-		otelgrpc.WithMeterProvider(telemeter.MeterProvider),
-		otelgrpc.WithPropagators(telemeter.Propagator),
-	))
 
 	if validator != nil {
 		interceptors = append(interceptors, grpc_validate.UnaryServerInterceptor(validator))
@@ -40,12 +44,6 @@ func newServerUnaryInterceptors(telemeter telemetry.Telemetry, validator *protov
 
 func newServerStreamInterceptors(telemeter telemetry.Telemetry, validator *protovalidate.Validator) grpc.ServerOption {
 	var interceptors []grpc.StreamServerInterceptor
-
-	interceptors = append(interceptors, otelgrpc.StreamServerInterceptor(
-		otelgrpc.WithTracerProvider(telemeter.TracerProvider),
-		otelgrpc.WithMeterProvider(telemeter.MeterProvider),
-		otelgrpc.WithPropagators(telemeter.Propagator),
-	))
 
 	if validator != nil {
 		interceptors = append(interceptors, grpc_validate.StreamServerInterceptor(validator))

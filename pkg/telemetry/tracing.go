@@ -9,11 +9,12 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 	trace_sdk "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/noop"
 )
 
 func SetupTracing(cfg config.Config, tracing conf.Tracing) (trace.TracerProvider, trace_sdk.SpanExporter, error) {
 	if !tracing.Enabled {
-		return trace.NewNoopTracerProvider(), nil, nil
+		return noop.NewTracerProvider(), nil, nil
 	}
 
 	var tracerProvider trace.TracerProvider
@@ -26,7 +27,7 @@ func SetupTracing(cfg config.Config, tracing conf.Tracing) (trace.TracerProvider
 			return nil, nil, err
 		}
 	default:
-		tracerProvider = trace.NewNoopTracerProvider()
+		tracerProvider = noop.NewTracerProvider()
 	}
 
 	return tracerProvider, traceExporter, nil
