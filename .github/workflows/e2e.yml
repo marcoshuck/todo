@@ -7,7 +7,7 @@ on:
     tags:
       - v*
 jobs:
-  test:
+  e2e:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
