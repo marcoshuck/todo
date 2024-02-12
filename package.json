@@ -1,0 +1,18 @@
+{
+  "name": "todo",
+  "version": "0.6.0",
+  "description": "A production-grade web service written in Go, showcasing various features and technologies.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {},
+  "keywords": [],
+  "author": "Marcos Huck",
+  "license": "MIT",
+  "devDependencies": {
+    "@bufbuild/protobuf": "^1.7.2",
+    "@playwright/test": "^1.41.2",
+    "@types/node": "^20.11.17"
+  }
+}

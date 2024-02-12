@@ -25,5 +25,9 @@ go.work
 # IDEs
 .idea/
 
-# Protocol buffers stubs
-gen/
+# Tests
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
