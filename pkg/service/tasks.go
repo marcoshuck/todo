@@ -83,7 +83,7 @@ func (svc *tasks) CreateTask(ctx context.Context, request *tasksv1.CreateTaskReq
 	if err != nil {
 		svc.logger.Error("Failed to create task", zap.Error(err))
 		span.RecordError(err)
-		return nil, status.Errorf(codes.Unavailable, "failed to create task")
+		return nil, status.Error(codes.Unavailable, "failed to create task")
 	}
 	svc.logger.Debug("Returning created task", zap.String("task.title", request.GetTask().GetTitle()))
 	return task.API(), nil
@@ -91,32 +91,50 @@ func (svc *tasks) CreateTask(ctx context.Context, request *tasksv1.CreateTaskReq
 
 // DeleteTask deletes a task.
 func (svc *tasks) DeleteTask(ctx context.Context, request *tasksv1.DeleteTaskRequest) (*tasksv1.Task, error) {
+	svc.logger.Debug("Deleting task", zap.Int64("task.id", request.GetId()))
+	span := trace.SpanFromContext(ctx)
+	defer span.End()
 	task, err := svc.GetTask(ctx, &tasksv1.GetTaskRequest{Id: request.GetId()})
 	if err != nil {
 		return nil, err
 	}
+	span.AddEvent("Deleting task from the database")
 	err = svc.db.Model(&domain.Task{}).Delete(&domain.Task{}, task.GetId()).Error
 	if err != nil {
-		return nil, status.Errorf(codes.Unavailable, "failed to delete task")
+		svc.logger.Error("Failed to delete task", zap.Error(err))
+		span.RecordError(err)
+		return nil, status.Error(codes.Unavailable, "failed to delete task")
 	}
+	svc.logger.Debug("Task was deleted", zap.Int64("task.id", request.GetId()))
 	return task, nil
 }
 
 // UndeleteTask undeletes a task. Opposite operation to DeleteTask.
 func (svc *tasks) UndeleteTask(ctx context.Context, request *tasksv1.UndeleteTaskRequest) (*tasksv1.Task, error) {
+	svc.logger.Debug("Undeleting task", zap.Int64("task.id", request.GetId()))
+	span := trace.SpanFromContext(ctx)
+	defer span.End()
 	err := svc.db.Model(&domain.Task{}).Unscoped().Where("id = ?", request.GetId()).Update("deleted_at", nil).Error
 	if err != nil {
+		svc.logger.Error("Failed to undelete task", zap.Error(err))
+		span.RecordError(err)
 		return nil, status.Error(codes.Unavailable, "failed to undelete task")
 	}
 	task, err := svc.GetTask(ctx, &tasksv1.GetTaskRequest{Id: request.GetId()})
 	if err != nil {
 		return nil, err
 	}
+	svc.logger.Debug("Task was undeleted", zap.Int64("task.id", request.GetId()))
 	return task, nil
 }
 
 // UpdateTask updates a task.
 func (svc *tasks) UpdateTask(ctx context.Context, request *tasksv1.UpdateTaskRequest) (*tasksv1.Task, error) {
+	svc.logger.Debug("Updating task", zap.Int64("task.id", request.GetTask().GetId()))
+
+	span := trace.SpanFromContext(ctx)
+	defer span.End()
+
 	_, err := svc.GetTask(ctx, &tasksv1.GetTaskRequest{Id: request.GetTask().GetId()})
 	if err != nil {
 		return nil, err
@@ -126,12 +144,17 @@ func (svc *tasks) UpdateTask(ctx context.Context, request *tasksv1.UpdateTaskReq
 	task.FromAPI(request.GetTask())
 	m, err := task.ApplyMask(request.GetUpdateMask())
 	if err != nil {
-		return nil, err
+		svc.logger.Error("Failed to apply update mask", zap.Error(err))
+		span.RecordError(err)
+		return nil, status.Error(codes.Internal, "failed to generate update mask")
 	}
 	err = svc.db.Model(&domain.Task{}).Where("id = ?", request.GetTask().GetId()).Updates(m).Error
 	if err != nil {
-		return nil, err
+		svc.logger.Error("Failed to update task", zap.Error(err))
+		span.RecordError(err)
+		return nil, status.Error(codes.Internal, "failed to update task")
 	}
+	svc.logger.Debug("Task was updated", zap.Int64("task.id", request.GetTask().GetId()))
 	return svc.GetTask(ctx, &tasksv1.GetTaskRequest{Id: request.GetTask().GetId()})
 }
 
