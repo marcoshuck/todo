@@ -58,7 +58,7 @@ message UndeleteTaskRequest {
 }
 
 message UpdateTaskRequest {
-  Task task = 1 [(google.api.field_behavior) = REQUIRED];
+  Task task = 1 [(google.api.field_behavior) = REQUIRED, (buf.validate.field).skipped = true];
 
   google.protobuf.FieldMask update_mask = 2;
 }
