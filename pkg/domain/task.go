@@ -101,17 +101,3 @@ func (t *Task) ApplyMask(mask *fieldmaskpb.FieldMask) (map[string]any, error) {
 	}
 	return m, nil
 }
-
-// Map converts the current Task to a map.
-func (t *Task) Map() map[string]any {
-	b, err := t.JSON()
-	if err != nil {
-		return nil
-	}
-	m := make(map[string]any)
-	err = json.Unmarshal(b, &m)
-	if err != nil {
-		return nil
-	}
-	return m
-}
