@@ -2,7 +2,7 @@ package server
 
 import (
 	"github.com/gojaguar/jaguar/config"
-	"github.com/marcoshuck/todo/pkg/conf"
+	"github.com/marcoshuck/todo/internal/conf"
 	"github.com/stretchr/testify/suite"
 	"os"
 	"testing"

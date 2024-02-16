@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
-	"github.com/marcoshuck/todo/pkg/domain"
+	"github.com/marcoshuck/todo/internal/domain"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"

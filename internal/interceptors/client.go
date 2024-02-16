@@ -3,7 +3,7 @@ package interceptors
 import (
 	grpc_logging "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
-	"github.com/marcoshuck/todo/pkg/telemetry"
+	"github.com/marcoshuck/todo/internal/telemetry"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"time"

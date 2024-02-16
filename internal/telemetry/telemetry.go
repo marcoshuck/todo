@@ -2,7 +2,7 @@ package telemetry
 
 import (
 	"github.com/gojaguar/jaguar/config"
-	"github.com/marcoshuck/todo/pkg/conf"
+	"github.com/marcoshuck/todo/internal/conf"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/propagation"
 	metric_sdk "go.opentelemetry.io/otel/sdk/metric"
