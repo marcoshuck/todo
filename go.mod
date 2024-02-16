@@ -3,7 +3,7 @@ module github.com/marcoshuck/todo
 go 1.20
 
 require (
-	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.31.0-20230802163732-1c33ebd9ecfa.1
+	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.32.0-20240212200630-3014d81c3a48.1
 	dagger.io/dagger v0.9.6
 	github.com/bufbuild/protovalidate-go v0.2.1
 	github.com/caarlos0/env/v9 v9.0.0
