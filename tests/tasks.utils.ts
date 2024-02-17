@@ -1,5 +1,5 @@
 import {APIRequestContext, expect} from "@playwright/test";
-import {Task} from '../gen/typescript/api/tasks/v1/tasks_pb';
+import {Task} from '../api/tasks/v1/tasks_pb';
 
 export async function createTask(request: APIRequestContext, input: any): Promise<Task> {
     // Send the request and wait for the response.
