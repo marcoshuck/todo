@@ -36,7 +36,7 @@ In future iterations, this project could extend its domain to contemplate Users,
 
 ### Running the application
 
-The ToDo Application ca be run either locally by using [docker-compose](deployments/local), or be deployed to
+The ToDo Application can be run either locally by using [docker-compose](deployments/local), or be deployed to
 a [Kubernetes](deployments/kubernetes) cluster.
 
 ### Persistence
@@ -69,10 +69,16 @@ transactions between distributed services. Jaeger serves as a crucial tool for m
 microservices environments. With its tracing capabilities, Jaeger provides insights into the flow of transactions,
 aiding in the identification and resolution of issues within the distributed architecture.
 
-#### Logging (stdout)
+#### Logging (Zap + stdout)
 
-The application currently logs information to the standard output, providing basic visibility into its operations. To
-enhance and centralize the logging process, a [pull request](https://github.com/marcoshuck/todo/pull/52) is in progress
+The application currently logs information to the standard output using [Zap](https://github.com/uber-go/zap), providing
+basic visibility into its operations.
+
+To configure different environments, the application relies on the `ENVIRONMENT` environment variable, which accepts the
+following values: `production` and `staging`. If no environment is explicitly set, logging will be disabled.
+
+To enhance and centralize the logging process, a [pull request](https://github.com/marcoshuck/todo/pull/52) is in
+progress
 to enable log aggregation using three key components:
 
 1. **Logstash:** Logstash serves as a powerful log processing pipeline, facilitating the collection, transformation, and
