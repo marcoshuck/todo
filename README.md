@@ -20,6 +20,11 @@ discuss your needs and embark on a journey together.
 **Services**: Software Engineering, Mentorships, Software architecture, Personalized training in any of the tools listed
 below.
 
+## Design document
+
+In case you're interested in the technical explanation about this repository, feel free to check out
+the [DESIGN](DESIGN.md) document.
+
 ## Features
 - **Transport Mechanism**: [gRPC](https://grpc.io/)
 
