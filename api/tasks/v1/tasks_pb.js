@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { FieldMask, proto3, Timestamp } from "@bufbuild/protobuf";
+import {FieldMask, proto3, Timestamp} from "@bufbuild/protobuf";
 
 /**
  * @generated from message api.tasks.v1.Task

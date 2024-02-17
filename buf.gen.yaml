@@ -28,6 +28,6 @@ plugins:
       - merge_file_name=api
       - output_format=yaml
   - plugin: buf.build/protocolbuffers/dart:v21.1.2
-    out: gen/dart
+    out: .
   - plugin: buf.build/bufbuild/es:v1.7.2
-    out: gen/typescript
+    out: .
