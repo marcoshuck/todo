@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/marcoshuck/todo/pkg/conf"
-	"github.com/marcoshuck/todo/pkg/server"
+	"github.com/marcoshuck/todo/internal/conf"
+	"github.com/marcoshuck/todo/internal/server"
 	"log"
 )
 

@@ -2,8 +2,8 @@ package gateway
 
 import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/marcoshuck/todo/pkg/conf"
-	"github.com/marcoshuck/todo/pkg/telemetry"
+	"github.com/marcoshuck/todo/internal/conf"
+	"github.com/marcoshuck/todo/internal/telemetry"
 	"net/http"
 )
 

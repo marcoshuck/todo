@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
-	"github.com/marcoshuck/todo/pkg/domain"
+	"github.com/marcoshuck/todo/internal/domain"
 	"github.com/stretchr/testify/suite"
 	"go.opentelemetry.io/otel/metric/noop"
 	"go.uber.org/zap"

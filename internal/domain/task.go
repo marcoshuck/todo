@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/gojaguar/jaguar/strings"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
-	"github.com/marcoshuck/todo/pkg/serializer"
+	"github.com/marcoshuck/todo/internal/serializer"
 	fieldmask_utils "github.com/mennanov/fieldmask-utils"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 	"google.golang.org/protobuf/types/known/timestamppb"

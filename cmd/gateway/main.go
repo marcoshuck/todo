@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"github.com/marcoshuck/todo/pkg/conf"
-	"github.com/marcoshuck/todo/pkg/gateway"
+	"github.com/marcoshuck/todo/internal/conf"
+	"github.com/marcoshuck/todo/internal/gateway"
 	"log"
 )
 

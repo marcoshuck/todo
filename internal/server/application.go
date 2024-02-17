@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
-	"github.com/marcoshuck/todo/pkg/conf"
+	"github.com/marcoshuck/todo/internal/conf"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/multierr"

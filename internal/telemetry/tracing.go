@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gojaguar/jaguar/config"
-	"github.com/marcoshuck/todo/pkg/conf"
+	"github.com/marcoshuck/todo/internal/conf"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
 	trace_sdk "go.opentelemetry.io/otel/sdk/trace"
