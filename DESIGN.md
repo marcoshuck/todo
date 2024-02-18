@@ -39,6 +39,19 @@ In future iterations, this project could extend its domain to contemplate Users,
 The ToDo Application can be run either locally by using [docker-compose](deployments/local), or be deployed to
 a [Kubernetes](deployments/kubernetes) cluster.
 
+#### Kubernetes
+
+The kubernetes set up is rather simple, and it can be found under the `deployments/kubernetes` folder:
+
+```mermaid
+flowchart LR
+    ingress[Ingress] --> svc[Service/ClusterIP]
+    svc --> deploy-gw[Depoyment/Gateway]
+    deploy-gw --> deploy-app[Deployment/gRPC server]
+```
+
+NOTE: The ingress was not included due to the many possibilities that can be used for exposing the actual service to the internet.
+
 ### Persistence
 
 This application relies on a database engine that can be configured using the `DATABASE_` environment variables found in
