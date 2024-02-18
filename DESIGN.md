@@ -25,6 +25,12 @@ Further readings:
 - [OpenAPI reference](api/api.swagger.yaml)
 - [Google API Improvement Proposals (AIP)](https://google.aip.dev)
 
+### Code generation
+
+This project is using [Protocol buffers](https://protobuf.dev/) as single source of truth. Proto files can be found under the `api/` folder.
+
+In order to avoid repeating code, this project uses a tool called [Buf](https://buf.build/), which allows to generate stubs for different languages: `Go`, `TypeScript` and `Dart` are generated as example and also included in the source code. You can check the [buf.yaml](buf.yaml) and [buf.gen.yaml](buf.gen.yaml) configuration to learn how the different Buf plugins are configured to generate code for this project.
+
 ## Domain
 
 The domain of the ToDo application currently has a single entity called Task. Tasks group a definition of what needs to
