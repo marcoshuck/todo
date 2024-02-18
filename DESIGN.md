@@ -5,6 +5,10 @@
 This document contains the technical documentation for the ToDo application. This document provides an overview of the
 architectural choices and design principles followed throughout the development of this project.
 
+## Motivation
+
+This repository wasn't born from a training exercise, but rather from a desire to consolidate years of experience into a practical resource for the community. Witnessing the learning curve individuals face when exploring new technologies like gRPC and navigating intricate setups, I sought to create a comprehensive, single source of knowledge.
+
 ## API specification
 
 This API adheres to the [Google API Improvement Proposals (AIP)](https://google.aip.dev) guidelines, ensuring a
