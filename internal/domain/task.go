@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"encoding/json"
 	"errors"
 	"github.com/gojaguar/jaguar/strings"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
@@ -9,13 +8,10 @@ import (
 	fieldmask_utils "github.com/mennanov/fieldmask-utils"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"gopkg.in/yaml.v3"
 	"gorm.io/gorm"
 	"time"
 )
 
-var _ serializer.JSON = (*Task)(nil)
-var _ serializer.YAML = (*Task)(nil)
 var _ serializer.API[*tasksv1.Task] = (*Task)(nil)
 
 // Task defines the scope of an action a User implements in their tasks dashboard.
@@ -63,26 +59,6 @@ func (t *Task) FromAPI(in *tasksv1.Task) {
 	}
 	t.CreatedAt = in.GetCreateTime().AsTime()
 	t.UpdatedAt = in.GetUpdateTime().AsTime()
-}
-
-// JSON converts this Task to a slice of bytes in JSON format.
-func (t *Task) JSON() ([]byte, error) {
-	return json.Marshal(t)
-}
-
-// FromJSON converts a slice of bytes in JSON format to a Task.
-func (t *Task) FromJSON(data []byte) error {
-	return json.Unmarshal(data, t)
-}
-
-// YAML converts this Task to a slice of bytes in YAML format.
-func (t *Task) YAML() ([]byte, error) {
-	return yaml.Marshal(t)
-}
-
-// FromYAML converts a slice of bytes in YAML format to a Task.
-func (t *Task) FromYAML(data []byte) error {
-	return yaml.Unmarshal(data, t)
 }
 
 // ApplyMask returns the Map of the current Task with the given mask applied.
