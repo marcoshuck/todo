@@ -7,7 +7,7 @@ require (
 	dagger.io/dagger v0.9.6
 	github.com/bufbuild/protovalidate-go v0.2.1
 	github.com/caarlos0/env/v9 v9.0.0
-	github.com/go-chi/chi/v5 v5.0.11
+	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-chi/cors v1.2.1
 	github.com/gojaguar/jaguar v0.6.1
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.1
