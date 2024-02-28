@@ -1,6 +1,6 @@
 module github.com/marcoshuck/todo
 
-go 1.20
+go 1.22
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.32.0-20240221180331-f05a6f4403ce.1
