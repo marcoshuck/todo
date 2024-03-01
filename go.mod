@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.32.0-20240221180331-f05a6f4403ce.1
-	dagger.io/dagger v0.9.11
+	dagger.io/dagger v0.10.0
 	github.com/bufbuild/protovalidate-go v0.5.2
 	github.com/caarlos0/env/v9 v9.0.0
 	github.com/go-chi/chi/v5 v5.0.12

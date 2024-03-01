@@ -7,8 +7,8 @@ cloud.google.com/go/compute v1.23.3 h1:6sVlXXBmbd7jNX0Ipq0trII3e4n1/MsADLK6a+aiV
 cloud.google.com/go/compute v1.23.3/go.mod h1:VCgBUoMnIVIR0CscqQiPJLAG25E3ZRZMzcFZeQ+h8CI=
 cloud.google.com/go/compute/metadata v0.2.3 h1:mg4jlk7mCAj6xXp9UJ4fjI9VUI5rubuGBW5aJ7UnBMY=
 cloud.google.com/go/compute/metadata v0.2.3/go.mod h1:VAV5nSsACxMJvgaAuX6Pk2AawlZn8kiOGuCv6gTkwuA=
-dagger.io/dagger v0.9.11 h1:jyfqKKzkQHIzJHIaQRJ9C/rA7LSloRB1MRUJkm5J1bU=
-dagger.io/dagger v0.9.11/go.mod h1:aq9P87v4apEOXKPXzn35uK+by5dUplSU5ZeXm+E8Sgw=
+dagger.io/dagger v0.10.0 h1:iRzQLVOe89rZQwfpcKq8kZLBLXU50uiDti7txZjcl6A=
+dagger.io/dagger v0.10.0/go.mod h1:aq9P87v4apEOXKPXzn35uK+by5dUplSU5ZeXm+E8Sgw=
 github.com/99designs/gqlgen v0.17.31 h1:VncSQ82VxieHkea8tz11p7h/zSbvHSxSDZfywqWt158=
 github.com/99designs/gqlgen v0.17.31/go.mod h1:i4rEatMrzzu6RXaHydq1nmEPZkb3bKQsnxNRHS4DQB4=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
