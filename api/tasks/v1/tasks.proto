@@ -9,6 +9,32 @@ import "google/api/client.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/field_mask.proto";
 import "buf/validate/validate.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Todo API";
+    version: "0.8";
+    description: "A web service written in Go, showcasing various features and technologies used in real world production-grade applications.";
+    contact: {
+      name: "Marcos Huck";
+      url: "https://github.com/marcoshuck";
+      email: "marcos@huck.com.ar";
+    };
+    license: {
+      name: "MIT License";
+      url: "https://github.com/marcoshuck/todo/blob/main/LICENSE";
+    };
+  };
+  external_docs: {
+    url: "https://github.com/marcoshuck/todo/blob/main/README.md";
+    description: "README";
+  };
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+};
 
 
 message Task {
