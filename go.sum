@@ -2,8 +2,8 @@ buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.32.0-2024022118033
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.32.0-20240221180331-f05a6f4403ce.1/go.mod h1:tiTMKD8j6Pd/D2WzREoweufjzaJKHZg35f/VGcZ2v3I=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
-dagger.io/dagger v0.9.11 h1:jyfqKKzkQHIzJHIaQRJ9C/rA7LSloRB1MRUJkm5J1bU=
-dagger.io/dagger v0.9.11/go.mod h1:aq9P87v4apEOXKPXzn35uK+by5dUplSU5ZeXm+E8Sgw=
+dagger.io/dagger v0.10.2 h1:8q4AwKm48qAWZdY7O2NMZ3FveteDHJeM3WwmcNKZOM0=
+dagger.io/dagger v0.10.2/go.mod h1:AonAYX6ZXNGsVvro4HhB/Uzsp9FU+aI41YfAEY9f5mI=
 github.com/99designs/gqlgen v0.17.31 h1:VncSQ82VxieHkea8tz11p7h/zSbvHSxSDZfywqWt158=
 github.com/99designs/gqlgen v0.17.31/go.mod h1:i4rEatMrzzu6RXaHydq1nmEPZkb3bKQsnxNRHS4DQB4=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
@@ -160,8 +160,8 @@ github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
 github.com/stretchr/testify v1.8.1/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
-github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
-github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
+github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsTg=
+github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
 github.com/uptrace/opentelemetry-go-extra/otelgorm v0.2.3 h1:girTS67d1m8+XUJLbNBDjCSH8BtujWFoI93W1OUjFIc=
 github.com/uptrace/opentelemetry-go-extra/otelgorm v0.2.3/go.mod h1:kjsn/ilDe5TABXwTy7Dg/Lfr2pRAjrCD+yPV+pbhOMY=
 github.com/uptrace/opentelemetry-go-extra/otelsql v0.2.3 h1:LNi0Qa7869/loPjz2kmMvp/jwZZnMZ9scMJKhDJ1DIo=
