@@ -1,10 +1,20 @@
 swagger: "2.0"
 info:
-  title: api/tasks/v1/tasks.proto
-  version: version not set
+  title: Todo API
+  description: A web service written in Go, showcasing various features and technologies used in real world production-grade applications.
+  version: "0.8"
+  contact:
+    name: Marcos Huck
+    url: https://github.com/marcoshuck
+    email: marcos@huck.com.ar
+  license:
+    name: MIT License
+    url: https://github.com/marcoshuck/todo/blob/main/LICENSE
 tags:
   - name: TasksWriterService
   - name: TasksReaderService
+schemes:
+  - https
 consumes:
   - application/json
 produces:
@@ -220,3 +230,6 @@ definitions:
         format: int64
     required:
       - id
+externalDocs:
+  description: README
+  url: https://github.com/marcoshuck/todo/blob/main/README.md

@@ -4,14 +4,14 @@
 // @ts-nocheck
 
 import type {
-    BinaryReadOptions,
-    FieldList,
-    FieldMask,
-    JsonReadOptions,
-    JsonValue,
-    PartialMessage,
-    PlainMessage,
-    Timestamp
+  BinaryReadOptions,
+  FieldList,
+  FieldMask,
+  JsonReadOptions,
+  JsonValue,
+  PartialMessage,
+  PlainMessage,
+  Timestamp
 } from "@bufbuild/protobuf";
 import {Message, proto3} from "@bufbuild/protobuf";
 
