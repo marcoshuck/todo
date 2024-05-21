@@ -3,7 +3,7 @@ module github.com/marcoshuck/todo
 go 1.21
 
 require (
-	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.33.0-20240401165935-b983156c5e99.1
+	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.34.1-20240508200655-46a4cf4ba109.1
 	dagger.io/dagger v0.10.2
 	github.com/bufbuild/protovalidate-go v0.6.2
 	github.com/caarlos0/env/v9 v9.0.0
@@ -28,7 +28,7 @@ require (
 	go.uber.org/zap v1.27.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240401170217-c3f982113cda
 	google.golang.org/grpc v1.62.1
-	google.golang.org/protobuf v1.33.0
+	google.golang.org/protobuf v1.34.1
 	gorm.io/driver/sqlite v1.5.5
 	gorm.io/gorm v1.25.10
 )
