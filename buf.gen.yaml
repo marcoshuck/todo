@@ -16,18 +16,16 @@ plugins:
     out: .
     opt:
       - paths=source_relative
-  - plugin: buf.build/grpc-ecosystem/gateway:v2.19.1
+  - plugin: buf.build/grpc-ecosystem/gateway:v2.20.0
     out: .
     opt:
       - paths=source_relative
       - logtostderr=true
-  - plugin: buf.build/grpc-ecosystem/openapiv2:v2.19.1
+  - plugin: buf.build/grpc-ecosystem/openapiv2:v2.20.0
     out: api
     opt:
       - allow_merge=true
       - merge_file_name=api
       - output_format=yaml
-  - plugin: buf.build/protocolbuffers/dart:v21.1.2
-    out: .
-  - plugin: buf.build/bufbuild/es:v1.7.2
+  - plugin: buf.build/bufbuild/es:v1.10.0
     out: .
