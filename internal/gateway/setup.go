@@ -28,7 +28,6 @@ func Setup(ctx context.Context, cfg conf.GatewayConfig) (Gateway, error) {
 
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(),
 		interceptors.NewClientUnaryInterceptors(telemeter),
 		interceptors.NewClientStreamInterceptors(telemeter),
 		grpc.WithStatsHandler(

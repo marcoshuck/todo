@@ -39,7 +39,7 @@ func newMetrics(cfg config.Config, metrics conf.Metrics) (metric.MeterProvider, 
 	if err != nil {
 		return nil, nil, err
 	}
-	conn, err := newConn(ctx, metrics.Address())
+	conn, err := newClient(metrics.Address())
 	if err != nil {
 		return nil, nil, err
 	}
