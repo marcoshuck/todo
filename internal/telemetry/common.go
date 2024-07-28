@@ -19,8 +19,8 @@ func newResource(ctx context.Context, cfg config.Config) (*resource.Resource, er
 	)
 }
 
-func newConn(ctx context.Context, addr string) (*grpc.ClientConn, error) {
-	conn, err := grpc.DialContext(ctx, addr,
+func newClient(addr string) (*grpc.ClientConn, error) {
+	conn, err := grpc.NewClient(addr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {

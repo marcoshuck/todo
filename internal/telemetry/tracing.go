@@ -39,7 +39,7 @@ func newTracing(cfg config.Config, tracing conf.Tracing) (trace.TracerProvider, 
 	if err != nil {
 		return nil, nil, err
 	}
-	conn, err := newConn(ctx, tracing.Address())
+	conn, err := newClient(tracing.Address())
 	if err != nil {
 		return nil, nil, err
 	}
