@@ -12,7 +12,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
-	"time"
 )
 
 // tasks implements tasksv1.TasksWriterServiceServer.
@@ -64,7 +63,7 @@ func (svc *tasks) ListTasks(ctx context.Context, request *tasksv1.ListTasksReque
 	if len(request.GetPageToken()) > 0 {
 		updatedAt, err := serializer.DecodePageToken(request.GetPageToken())
 		if err == nil {
-			query = query.Where("updated_at < ?", updatedAt.Format(time.RFC3339Nano))
+			query = query.Where("updated_at < ?", updatedAt)
 		}
 	}
 
