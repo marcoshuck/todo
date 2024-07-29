@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
+	"time"
 )
 
 // tasks implements tasksv1.TasksWriterServiceServer.
@@ -63,7 +64,7 @@ func (svc *tasks) ListTasks(ctx context.Context, request *tasksv1.ListTasksReque
 	if len(request.GetPageToken()) > 0 {
 		updatedAt, err := serializer.DecodePageToken(request.GetPageToken())
 		if err == nil {
-			query = query.Where("updated_at < ?", updatedAt)
+			query = query.Where("updated_at < ?", updatedAt.Format(time.RFC3339))
 		}
 	}
 
@@ -102,6 +103,9 @@ func (svc *tasks) CreateTask(ctx context.Context, request *tasksv1.CreateTaskReq
 	svc.logger.Debug("Filling out task information")
 	span.AddEvent("Parsing task from API request")
 	task.FromAPI(request.GetTask())
+	now := time.Now()
+	task.CreatedAt = now
+	task.UpdatedAt = now
 	span.AddEvent("Persisting task in the database")
 	svc.logger.Debug("Persisting task in the database", zap.String("task.title", request.GetTask().GetTitle()))
 	err := svc.db.Model(&domain.Task{}).WithContext(ctx).Create(&task).Error

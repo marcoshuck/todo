@@ -13,6 +13,7 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"testing"
+	"time"
 )
 
 func TestTasksServiceSuite(t *testing.T) {
@@ -63,6 +64,8 @@ func (suite *TasksServiceTestSuite) TestCreate_Success() {
 	suite.Assert().NoError(err)
 	suite.Assert().NotNil(res)
 	suite.Assert().Equal(title, res.GetTitle())
+	suite.Assert().NotZero(res.GetCreateTime().AsTime())
+	suite.Assert().NotZero(res.GetUpdateTime().AsTime())
 
 	var after int64
 	suite.Require().NoError(suite.db.Model(&domain.Task{}).Count(&after).Error)
@@ -115,6 +118,7 @@ func (suite *TasksServiceTestSuite) TestList_Success() {
 			},
 		})
 		suite.Require().NoError(err)
+		time.Sleep(1 * time.Second)
 	}
 
 	var expected int64

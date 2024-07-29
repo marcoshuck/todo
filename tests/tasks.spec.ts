@@ -51,6 +51,7 @@ test('GET /v1/tasks', async ({request}) => {
     for (let i = 0; i < 10; i++) {
         let task = await createTask(request, input);
         list.push(task);
+        await new Promise(r => setTimeout(r, 1000));
     }
 
     let response = await listTasks(request, 5, undefined);
