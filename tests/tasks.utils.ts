@@ -24,8 +24,13 @@ export async function getTask(request: APIRequestContext, id: bigint) {
     }
 }
 
-export async function listTasks(request: APIRequestContext) {
-    const response = await request.get(`/v1/tasks`);
+export async function listTasks(request: APIRequestContext, size: number, nextPageToken: string | undefined) {
+    const response = await request.get(`/v1/tasks`, {
+        params: {
+            "page_size": size,
+            "page_token": nextPageToken,
+        },
+    });
     const body = await response.body();
 
     return {

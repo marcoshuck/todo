@@ -53,7 +53,7 @@ test('GET /v1/tasks', async ({request}) => {
         list.push(task);
     }
 
-    let response = await listTasks(request);
+    let response = await listTasks(request, 5, undefined);
 
     expect(response.data.nextPageToken).not.toBe('');
 
