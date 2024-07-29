@@ -121,12 +121,22 @@ func (suite *TasksServiceTestSuite) TestList_Success() {
 	suite.Require().NoError(suite.db.Model(&domain.Task{}).Count(&expected).Error)
 
 	response, err := suite.reader.ListTasks(ctx, &tasksv1.ListTasksRequest{
-		PageSize:  0,
+		PageSize:  5,
 		PageToken: "",
 	})
 	suite.Assert().NoError(err)
 	suite.Assert().NotEmpty(response.GetTasks())
-	suite.Assert().Len(response.GetTasks(), int(expected))
+	suite.Assert().Len(response.GetTasks(), 5)
+	suite.Assert().NotEmpty(response.GetNextPageToken())
+
+	response, err = suite.reader.ListTasks(ctx, &tasksv1.ListTasksRequest{
+		PageSize:  5,
+		PageToken: response.GetNextPageToken(),
+	})
+	suite.Assert().NoError(err)
+	suite.Assert().NotEmpty(response.GetTasks())
+	suite.Assert().Len(response.GetTasks(), 5)
+	suite.Assert().Empty(response.GetNextPageToken())
 }
 
 func (suite *TasksServiceTestSuite) TestDelete_NotFound() {
