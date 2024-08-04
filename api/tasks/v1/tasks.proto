@@ -135,7 +135,6 @@ message ListTasksRequest {
   reserved "parent";
 
   int32 page_size = 2 [
-    (buf.validate.field).int32.gt = 0,
     (google.api.field_behavior) = OPTIONAL
   ];
   string page_token = 3 [

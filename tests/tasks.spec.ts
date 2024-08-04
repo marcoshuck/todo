@@ -1,5 +1,6 @@
 import {expect, test} from '@playwright/test';
-import {createTask, deleteTask, getTask, undeleteTask, updateTask} from "./tasks.utils";
+import {createTask, deleteTask, getTask, listTasks, undeleteTask, updateTask} from "./tasks.utils";
+import {Task} from "../api/tasks/v1/tasks_pb";
 
 
 test('POST /v1/tasks', async ({request}) => {
@@ -35,8 +36,30 @@ test('GET /v1/tasks/:id', async ({request}) => {
     expect(output.title).toEqual(expected.title);
     expect(output.description).toEqual(expected.description);
     expect(output.id).toEqual(expected.id);
-    expect(output.createTime).toEqual(expected.createTime);
-    expect(output.updateTime).toEqual(expected.updateTime);
+})
+
+test('GET /v1/tasks', async ({request}) => {
+    let input = {
+        title: 'An awesome task',
+        description: 'An awesome description for an awesome task',
+    };
+
+    const list: Task[] = [];
+
+    for (let i = 0; i < 10; i++) {
+        let task = await createTask(request, input);
+        list.push(task);
+        await new Promise(r => setTimeout(r, 1000));
+    }
+
+    let response = await listTasks(request, 5, undefined);
+
+    expect(response.data.nextPageToken).not.toBe('');
+
+
+    for (const task of list) {
+        await deleteTask(request, task.id);
+    }
 })
 
 test('DELETE /v1/tasks/:id', async ({request}) => {

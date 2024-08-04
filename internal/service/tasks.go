@@ -5,12 +5,14 @@ import (
 	"errors"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
 	"github.com/marcoshuck/todo/internal/domain"
+	"github.com/marcoshuck/todo/internal/serializer"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
+	"time"
 )
 
 // tasks implements tasksv1.TasksWriterServiceServer.
@@ -48,18 +50,41 @@ func (svc *tasks) ListTasks(ctx context.Context, request *tasksv1.ListTasksReque
 	svc.logger.Debug("Getting task list", zap.Int32("page_size", request.GetPageSize()), zap.String("page_token", request.GetPageToken()))
 	span := trace.SpanFromContext(ctx)
 	defer span.End()
+
 	span.AddEvent("Getting tasks from the database")
+	if request.GetPageSize() == 0 {
+		request.PageSize = 50
+	}
+
+	query := svc.db.Model(&domain.Task{}).WithContext(ctx)
+	if len(request.GetPageToken()) > 0 {
+		updatedAt, err := serializer.DecodePageToken(request.GetPageToken())
+		if err == nil {
+			svc.logger.Debug("Getting records older than page token", zap.Time("updated_at", updatedAt))
+			query = query.Where("updated_at < ?", updatedAt)
+		}
+	}
+	query = query.Limit(int(request.GetPageSize() + 1)).Order("updated_at DESC")
+
 	var out []domain.Task
-	err := svc.db.Model(&domain.Task{}).WithContext(ctx).Find(&out).Error
+	err := query.Find(&out).Error
 	if err != nil {
 		svc.logger.Error("Failed to list tasks", zap.Error(err))
 		span.RecordError(err)
 		return nil, status.Errorf(codes.Unavailable, "failed to get task: %v", err)
 	}
+
+	var nextPageToken string
+	if len(out) > int(request.GetPageSize()) {
+		nextPageToken = serializer.EncodePageToken(out[request.GetPageSize()-1].UpdatedAt)
+		svc.logger.Debug("Generating next page token", zap.Int32("page_size", request.GetPageSize()), zap.Int("count", len(out)), zap.String("page_token", nextPageToken), zap.Uint("last_element_id", out[request.GetPageSize()].ID))
+		out = out[:request.GetPageSize()]
+	}
+
 	svc.logger.Debug("Returning task list", zap.Int32("page_size", request.GetPageSize()), zap.String("page_token", request.GetPageToken()), zap.Int("count", len(out)))
 	res := tasksv1.ListTasksResponse{
 		Tasks:         make([]*tasksv1.Task, len(out)),
-		NextPageToken: "",
+		NextPageToken: nextPageToken,
 	}
 	for i, task := range out {
 		res.Tasks[i] = task.API()
@@ -77,6 +102,9 @@ func (svc *tasks) CreateTask(ctx context.Context, request *tasksv1.CreateTaskReq
 	svc.logger.Debug("Filling out task information")
 	span.AddEvent("Parsing task from API request")
 	task.FromAPI(request.GetTask())
+	now := time.Now()
+	task.CreatedAt = now
+	task.UpdatedAt = now
 	span.AddEvent("Persisting task in the database")
 	svc.logger.Debug("Persisting task in the database", zap.String("task.title", request.GetTask().GetTitle()))
 	err := svc.db.Model(&domain.Task{}).WithContext(ctx).Create(&task).Error
