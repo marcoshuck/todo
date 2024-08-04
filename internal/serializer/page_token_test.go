@@ -21,7 +21,12 @@ func TestDecodePageToken(t *testing.T) {
 
 	out, err := DecodePageToken(token)
 	assert.NoError(t, err)
-	assert.True(t, now.Equal(out))
+	assert.Equal(t, now.Year(), out.Year())
+	assert.Equal(t, now.Month(), out.Month())
+	assert.Equal(t, now.Day(), out.Day())
+	assert.Equal(t, now.Hour(), out.Hour())
+	assert.Equal(t, now.Minute(), out.Minute())
+	assert.Equal(t, now.Second(), out.Second())
 }
 
 func TestDecodePageToken_InvalidToken(t *testing.T) {
