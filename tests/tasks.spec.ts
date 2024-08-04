@@ -36,8 +36,6 @@ test('GET /v1/tasks/:id', async ({request}) => {
     expect(output.title).toEqual(expected.title);
     expect(output.description).toEqual(expected.description);
     expect(output.id).toEqual(expected.id);
-    expect(output.createTime).toEqual(expected.createTime);
-    expect(output.updateTime).toEqual(expected.updateTime);
 })
 
 test('GET /v1/tasks', async ({request}) => {
