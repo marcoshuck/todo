@@ -7,7 +7,7 @@ import (
 
 // EncodePageToken converts the given timestamp into a base64-encoded page token.
 func EncodePageToken(t time.Time) string {
-	return base64.URLEncoding.EncodeToString([]byte(t.Format(time.RFC3339Nano)))
+	return base64.URLEncoding.EncodeToString([]byte(t.Format(time.RFC3339)))
 }
 
 // DecodePageToken converts the given token into a valid timestamp.

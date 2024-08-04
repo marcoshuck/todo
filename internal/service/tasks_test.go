@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	tasksv1 "github.com/marcoshuck/todo/api/tasks/v1"
 	"github.com/marcoshuck/todo/internal/domain"
 	"github.com/stretchr/testify/suite"
@@ -25,6 +26,7 @@ type TasksServiceTestSuite struct {
 	db     *gorm.DB
 	writer tasksv1.TasksWriterServiceServer
 	reader tasksv1.TasksReaderServiceServer
+	logger *zap.Logger
 }
 
 func (suite *TasksServiceTestSuite) SetupSuite() {
@@ -33,12 +35,17 @@ func (suite *TasksServiceTestSuite) SetupSuite() {
 
 func (suite *TasksServiceTestSuite) SetupTest() {
 	var err error
+
+	suite.logger, err = zap.NewDevelopment()
+	suite.Require().NoError(err)
+
 	suite.db, err = gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
 	suite.Require().NoError(err)
+	suite.db = suite.db.Debug()
 	suite.Require().NoError(suite.db.Migrator().AutoMigrate(&domain.Task{}))
 
-	suite.writer = NewTasksWriter(suite.db, zap.NewNop(), noop.NewMeterProvider().Meter(""))
-	suite.reader = NewTasksReader(suite.db, zap.NewNop(), noop.NewMeterProvider().Meter(""))
+	suite.writer = NewTasksWriter(suite.db, suite.logger, noop.NewMeterProvider().Meter(""))
+	suite.reader = NewTasksReader(suite.db, suite.logger, noop.NewMeterProvider().Meter(""))
 }
 
 func (suite *TasksServiceTestSuite) TearDownTest() {
@@ -111,15 +118,17 @@ func (suite *TasksServiceTestSuite) TestList_Empty() {
 func (suite *TasksServiceTestSuite) TestList_Success() {
 	ctx := context.Background()
 
-	for i := 0; i < 10; i++ {
-		_, err := suite.writer.CreateTask(ctx, &tasksv1.CreateTaskRequest{
-			Task: &tasksv1.Task{
-				Title: "A test",
+	list := make([]domain.Task, 0, 10)
+	for i := 1; i <= 10; i++ {
+		list = append(list, domain.Task{
+			Model: gorm.Model{
+				CreatedAt: time.Now().Add(-time.Duration(i) * time.Hour),
+				UpdatedAt: time.Now().Add(-time.Duration(i) * time.Hour),
 			},
+			Title: fmt.Sprintf("%s %d", suite.T().Name(), i),
 		})
-		suite.Require().NoError(err)
-		time.Sleep(1 * time.Second)
 	}
+	suite.Require().NoError(suite.db.Create(list).Error)
 
 	var expected int64
 	suite.Require().NoError(suite.db.Model(&domain.Task{}).Count(&expected).Error)

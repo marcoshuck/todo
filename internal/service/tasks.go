@@ -56,17 +56,15 @@ func (svc *tasks) ListTasks(ctx context.Context, request *tasksv1.ListTasksReque
 		request.PageSize = 50
 	}
 
-	query := svc.db.Model(&domain.Task{}).
-		WithContext(ctx).
-		Limit(int(request.GetPageSize() + 1)).
-		Order("updated_at DESC")
-
+	query := svc.db.Model(&domain.Task{}).WithContext(ctx)
 	if len(request.GetPageToken()) > 0 {
 		updatedAt, err := serializer.DecodePageToken(request.GetPageToken())
 		if err == nil {
-			query = query.Where("updated_at < ?", updatedAt.Format(time.RFC3339))
+			svc.logger.Debug("Getting records older than page token", zap.Time("updated_at", updatedAt))
+			query = query.Where("updated_at < ?", updatedAt)
 		}
 	}
+	query = query.Limit(int(request.GetPageSize() + 1)).Order("updated_at DESC")
 
 	var out []domain.Task
 	err := query.Find(&out).Error
@@ -78,7 +76,8 @@ func (svc *tasks) ListTasks(ctx context.Context, request *tasksv1.ListTasksReque
 
 	var nextPageToken string
 	if len(out) > int(request.GetPageSize()) {
-		nextPageToken = serializer.EncodePageToken(out[request.GetPageSize()].UpdatedAt)
+		nextPageToken = serializer.EncodePageToken(out[request.GetPageSize()-1].UpdatedAt)
+		svc.logger.Debug("Generating next page token", zap.Int32("page_size", request.GetPageSize()), zap.Int("count", len(out)), zap.String("page_token", nextPageToken), zap.Uint("last_element_id", out[request.GetPageSize()].ID))
 		out = out[:request.GetPageSize()]
 	}
 
