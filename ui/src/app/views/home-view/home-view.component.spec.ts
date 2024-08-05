@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { HomeViewComponent } from './home-view.component';
+import {HomeViewComponent} from './home-view.component';
 
 describe('HomeViewComponent', () => {
   let component: HomeViewComponent;
@@ -10,7 +10,7 @@ describe('HomeViewComponent', () => {
     await TestBed.configureTestingModule({
       imports: [HomeViewComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(HomeViewComponent);
     component = fixture.componentInstance;

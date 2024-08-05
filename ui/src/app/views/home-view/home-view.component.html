@@ -4,29 +4,18 @@
       <mat-card-title>
         Tasks
       </mat-card-title>
-      <mat-card-content>
-        <mat-selection-list>
-          @for (task of tasks(); track task.id) {
-            <mat-list-option [selected]="!!task.completedAt">
-              {{ task.title }}
-            </mat-list-option>
-          } @empty {
-            No tasks available.
-          }
-        </mat-selection-list>
-      </mat-card-content>
-      <mat-card-footer>
-        <mat-card-actions>
-          <mat-form-field>
-            <mat-label>List size</mat-label>
-            <mat-select [(ngModel)]="pageSize">
-              @for (size of pageSizes; track size) {
-                <mat-option [value]="size">{{size}}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-        </mat-card-actions>
-      </mat-card-footer>
     </mat-card-header>
+    <mat-card-content>
+      <app-task-list [tasks]="tasks()"></app-task-list>
+    </mat-card-content>
+    <mat-card-footer>
+      <mat-card-actions>
+        <mat-paginator
+          (page)="handlePageEvent($event)"
+          [pageSizeOptions]="pageSizes"
+          [pageSize]="pageSize()"
+        ></mat-paginator>
+      </mat-card-actions>
+    </mat-card-footer>
   </mat-card>
 </app-main-layout>

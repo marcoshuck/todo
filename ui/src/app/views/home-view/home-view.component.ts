@@ -14,6 +14,9 @@ import {ListTasksResponse, Task} from "../../../api/tasks/v1/tasks_pb";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatOption, MatSelect} from "@angular/material/select";
 import {FormsModule} from "@angular/forms";
+import {TaskListItemComponent} from "../../tasks/task-list-item/task-list-item.component";
+import {MatPaginator, PageEvent} from "@angular/material/paginator";
+import {TaskListComponent} from "../../tasks/task-list/task-list.component";
 
 @Component({
   selector: 'app-home-view',
@@ -33,25 +36,30 @@ import {FormsModule} from "@angular/forms";
     MatSelect,
     MatOption,
     FormsModule,
-    MatCardActions
+    MatCardActions,
+    TaskListItemComponent,
+    MatPaginator,
+    TaskListComponent
   ],
   templateUrl: './home-view.component.html',
   styleUrl: './home-view.component.scss'
 })
 export class HomeViewComponent {
-  private nextPageToken?: string;
   protected pageSizes: number[] = [1, 10, 20, 30, 50];
-
   protected pageSize = model(1);
   protected tasks: WritableSignal<Task[]> = signal([]);
+  private nextPageToken?: string;
 
   constructor(private readonly taskService: TaskService) {
     this.listTasks();
     effect(() => {
-      console.log(this.pageSize());
       this.nextPageToken = undefined;
       this.listTasks();
     });
+  }
+
+  handlePageEvent(e: PageEvent) {
+    this.pageSize.set(e.pageSize);
   }
 
   private listTasks() {
