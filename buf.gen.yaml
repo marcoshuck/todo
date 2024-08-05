@@ -29,3 +29,5 @@ plugins:
       - output_format=yaml
   - plugin: buf.build/bufbuild/es:v1.10.0
     out: .
+  - plugin: buf.build/bufbuild/es:v1.10.0
+    out: ./ui/src
