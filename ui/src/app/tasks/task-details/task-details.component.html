@@ -1,0 +1,22 @@
+<mat-toolbar>
+  <button (click)="goBack()"
+          mat-icon-button
+  >
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span class="spacer"></span>
+  @if (task().id > 0) {
+    <span>{{ task().id }}</span>
+  }
+  <span class="spacer"></span>
+  <app-icon-button-star></app-icon-button-star>
+</mat-toolbar>
+@if (task().id <= 0) {
+  <mat-spinner class="spinner" diameter="50"></mat-spinner>
+} @else {
+  <mat-list>
+    <mat-list-item>{{ task().title }}</mat-list-item>
+    <mat-list-item>{{ task().description }}</mat-list-item>
+    <mat-list-item>{{ task().deadline }}</mat-list-item>
+  </mat-list>
+}
