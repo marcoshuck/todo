@@ -1,6 +1,7 @@
 import {Component, effect, model} from '@angular/core';
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
+import {environment} from "../../../environments/environment";
 
 @Component({
   selector: 'app-icon-button-star',
@@ -25,4 +26,6 @@ export class IconButtonStarComponent {
   star() {
     this.starred.set(!this.starred())
   }
+
+  protected readonly environment = environment;
 }

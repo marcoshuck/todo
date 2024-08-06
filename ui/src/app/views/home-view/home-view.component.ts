@@ -12,6 +12,7 @@ import {TaskService} from "../../tasks/task.service";
 import {ListTasksResponse, Task} from "../../../api/tasks/v1/tasks_pb";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {TaskListComponent} from "../../tasks/task-list/task-list.component";
+import {environment} from "../../../environments/environment";
 
 @Component({
   selector: 'app-home-view',
@@ -54,4 +55,6 @@ export class HomeViewComponent {
       this.nextPageToken = response.nextPageToken;
     })
   }
+
+  protected readonly environment = environment;
 }
