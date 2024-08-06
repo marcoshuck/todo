@@ -1,33 +1,35 @@
-version: v1
+version: v2
 managed:
   enabled: true
-  go_package_prefix:
-    default: github.com/marcoshuck/todo # <module_name>/<relative_path>
-    except:
-      - buf.build/googleapis/googleapis
-      - buf.build/grpc-ecosystem/grpc-gateway
-      - buf.build/bufbuild/protovalidate
+  override:
+    - file_option: go_package_prefix
+      value: github.com/marcoshuck/todo
+  disable:
+    - file_option: go_package
+      module: buf.build/googleapis/googleapis
+    - file_option: go_package
+      module: buf.build/grpc-ecosystem/grpc-gateway
+    - file_option: go_package
+      module: buf.build/bufbuild/protovalidate
 plugins:
-  - plugin: buf.build/protocolbuffers/go
+  - remote: buf.build/protocolbuffers/go:v1.34.2
     out: .
-    opt:
-      - paths=source_relative
-  - plugin: buf.build/grpc/go:v1.3.0
+    opt: paths=source_relative
+  - remote: buf.build/grpc/go:v1.5.1
     out: .
-    opt:
-      - paths=source_relative
-  - plugin: buf.build/grpc-ecosystem/gateway:v2.20.0
+    opt: paths=source_relative
+  - remote: buf.build/grpc-ecosystem/gateway:v2.21.0
     out: .
     opt:
       - paths=source_relative
       - logtostderr=true
-  - plugin: buf.build/grpc-ecosystem/openapiv2:v2.20.0
+  - remote: buf.build/grpc-ecosystem/openapiv2:v2.21.0
     out: api
     opt:
       - allow_merge=true
       - merge_file_name=api
       - output_format=yaml
-  - plugin: buf.build/bufbuild/es:v1.10.0
+  - remote: buf.build/bufbuild/es:v2.0.0
     out: .
-  - plugin: buf.build/bufbuild/es:v1.10.0
+  - remote: buf.build/bufbuild/es:v2.0.0
     out: ./ui/src
