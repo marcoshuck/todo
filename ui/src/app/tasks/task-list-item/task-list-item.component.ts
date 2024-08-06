@@ -1,7 +1,5 @@
 import {Component, Input, OnInit, signal} from '@angular/core';
 import {MatCheckbox} from "@angular/material/checkbox";
-import {MatIcon} from "@angular/material/icon";
-import {MatButtonModule} from "@angular/material/button";
 import {MatGridList, MatGridTile} from "@angular/material/grid-list";
 import {Task} from "../../../api/tasks/v1/tasks_pb";
 import {Router} from "@angular/router";
@@ -11,11 +9,9 @@ import {IconButtonStarComponent} from "../../components/icon-button-star/icon-bu
   selector: 'app-task-list-item',
   standalone: true,
   imports: [
-    MatCheckbox,
-    MatButtonModule,
-    MatIcon,
     MatGridList,
     MatGridTile,
+    MatCheckbox,
     IconButtonStarComponent
   ],
   templateUrl: './task-list-item.component.html',

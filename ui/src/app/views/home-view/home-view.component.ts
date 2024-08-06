@@ -8,13 +8,8 @@ import {
   MatCardHeader,
   MatCardTitle
 } from "@angular/material/card";
-import {MatListItem, MatListOption, MatSelectionList} from "@angular/material/list";
 import {TaskService} from "../../tasks/task.service";
 import {ListTasksResponse, Task} from "../../../api/tasks/v1/tasks_pb";
-import {MatFormField, MatLabel} from "@angular/material/form-field";
-import {MatOption, MatSelect} from "@angular/material/select";
-import {FormsModule} from "@angular/forms";
-import {TaskListItemComponent} from "../../tasks/task-list-item/task-list-item.component";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {TaskListComponent} from "../../tasks/task-list/task-list.component";
 
@@ -24,29 +19,20 @@ import {TaskListComponent} from "../../tasks/task-list/task-list.component";
   imports: [
     MainLayoutComponent,
     MatCard,
-    MatCardTitle,
     MatCardHeader,
     MatCardContent,
+    TaskListComponent,
     MatCardFooter,
-    MatSelectionList,
-    MatLabel,
-    MatListItem,
-    MatListOption,
-    MatFormField,
-    MatSelect,
-    MatOption,
-    FormsModule,
     MatCardActions,
-    TaskListItemComponent,
-    MatPaginator,
-    TaskListComponent
+    MatCardTitle,
+    MatPaginator
   ],
   templateUrl: './home-view.component.html',
   styleUrl: './home-view.component.scss'
 })
 export class HomeViewComponent {
-  protected pageSizes: number[] = [1, 10, 20, 30, 50];
-  protected pageSize = model(1);
+  protected pageSizes: number[] = [10, 20, 30, 50, 100];
+  protected pageSize = model(10);
   protected tasks: WritableSignal<Task[]> = signal([]);
   private nextPageToken?: string;
 
