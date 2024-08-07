@@ -5,7 +5,7 @@
       [disabled]="!environment.features.tasks.completed"
     ></mat-checkbox>
   </mat-grid-tile>
-  <mat-grid-tile (click)="seeMore()">
+  <mat-grid-tile class="title" (click)="seeMore()">
     {{ task.title }}
   </mat-grid-tile>
   <mat-grid-tile>
