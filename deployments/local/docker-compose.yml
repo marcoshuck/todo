@@ -16,9 +16,12 @@ services:
       - transport
       - persistence
       - monitoring
+      - events
     depends_on:
       - collector
       - db
+      - events
+
   gateway:
     image: "marcoshuck/todo-gw"
     build:
@@ -37,6 +40,7 @@ services:
     depends_on:
       - app
       - collector
+
   db:
     image: mysql:8
     container_name: db
@@ -50,6 +54,7 @@ services:
       - db_data:/var/lib/mysql
     networks:
       - persistence
+
   jaeger:
     image: jaegertracing/all-in-one:latest
     container_name: jaeger
@@ -68,6 +73,7 @@ services:
       - COLLECTOR_OTLP_ENABLED=true
     networks:
       - monitoring
+
   prometheus:
     image: prom/prometheus
     container_name: prometheus
@@ -115,6 +121,23 @@ services:
       - jaeger
       - prometheus
 
+  events:
+    container_name: events
+    image: nats:2.10.18
+    command:
+      - "--name=nats"
+      - "--cluster_name=events"
+      - "--cluster=nats://events:6222"
+      - "--routes=nats-route://events:6222"
+      - "--http_port=8222"
+      - "--js"
+      - "--sd=/data"
+    ports:
+      - 8222:8222
+    volumes:
+      - events_data:/data
+    networks:
+      - events
 
 networks:
   transport:
@@ -123,6 +146,9 @@ networks:
     name: "persistence"
   monitoring:
     name: "monitoring"
+  events:
+    name: "events"
 volumes:
   db_data:
   prometheus_data:
+  events_data:
