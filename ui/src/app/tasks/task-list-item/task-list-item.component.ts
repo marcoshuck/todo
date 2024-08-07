@@ -4,6 +4,7 @@ import {MatGridList, MatGridTile} from "@angular/material/grid-list";
 import {Task} from "../../../api/tasks/v1/tasks_pb";
 import {Router} from "@angular/router";
 import {IconButtonStarComponent} from "../../components/icon-button-star/icon-button-star.component";
+import {environment} from "../../../environments/environment";
 
 @Component({
   selector: 'app-task-list-item',
@@ -38,4 +39,6 @@ export class TaskListItemComponent implements OnInit {
   async seeMore() {
     await this.router.navigateByUrl(`/tasks/${this.task.id}`);
   }
+
+  protected readonly environment = environment;
 }

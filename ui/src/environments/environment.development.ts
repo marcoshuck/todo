@@ -6,6 +6,7 @@ export const environment = {
       star: false,
       pagination: false,
       creation: false,
+      completed: false,
     },
   },
 };

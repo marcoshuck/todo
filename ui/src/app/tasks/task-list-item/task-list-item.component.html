@@ -2,6 +2,7 @@
   <mat-grid-tile>
     <mat-checkbox
       [checked]="completed()"
+      [disabled]="!environment.features.tasks.completed"
     ></mat-checkbox>
   </mat-grid-tile>
   <mat-grid-tile (click)="seeMore()">
