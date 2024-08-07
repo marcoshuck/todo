@@ -1,0 +1,18 @@
+<mat-toolbar>
+  <button (click)="goBack()"
+          mat-icon-button
+  >
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span class="spacer"></span>
+  @if (task().id > 0) {
+    <span>{{ task().id }}</span>
+  }
+  <span class="spacer"></span>
+  <app-icon-button-star></app-icon-button-star>
+</mat-toolbar>
+<app-main-layout>
+  <app-task-details
+    [task]="task()"
+  ></app-task-details>
+</app-main-layout>

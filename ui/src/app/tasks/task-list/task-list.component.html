@@ -1,0 +1,7 @@
+@for (task of tasks(); track task.id) {
+  <app-task-list-item
+    [task]="task"
+  ></app-task-list-item>
+} @empty {
+  <mat-spinner class="spinner" diameter="50"></mat-spinner>
+}

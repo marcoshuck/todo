@@ -1,0 +1,9 @@
+<button (click)="star()"
+        mat-icon-button
+        [disabled]="!environment.features.tasks.star"
+>
+  <mat-icon
+    [fontIcon]="icon"
+  >
+  </mat-icon>
+</button>

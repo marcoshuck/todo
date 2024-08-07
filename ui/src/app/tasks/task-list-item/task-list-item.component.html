@@ -1,0 +1,19 @@
+<mat-grid-list cols="3" rowHeight="2rem">
+  <mat-grid-tile>
+    <mat-checkbox
+      [checked]="completed()"
+      [disabled]="!environment.features.tasks.completed"
+    ></mat-checkbox>
+  </mat-grid-tile>
+  <mat-grid-tile class="title" (click)="seeMore()">
+    {{ task.title }}
+  </mat-grid-tile>
+  <mat-grid-tile>
+    <app-icon-button-star
+      (starredChange)="this.star()"
+      [starred]="this.starred()"
+    >
+
+    </app-icon-button-star>
+  </mat-grid-tile>
+</mat-grid-list>

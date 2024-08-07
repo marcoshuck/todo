@@ -1,0 +1,22 @@
+<app-main-layout>
+  <h1>Todo App</h1>
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        Tasks
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <app-task-list [tasks]="tasks()"></app-task-list>
+    </mat-card-content>
+    <mat-card-footer>
+      <mat-card-actions>
+        <mat-paginator class="paginator" [disabled]="!environment.features.tasks.pagination"
+          (page)="handlePageEvent($event)"
+          [pageSizeOptions]="pageSizes"
+          [pageSize]="pageSize()"
+        ></mat-paginator>
+      </mat-card-actions>
+    </mat-card-footer>
+  </mat-card>
+</app-main-layout>

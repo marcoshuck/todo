@@ -1,0 +1,9 @@
+@if (task().id <= 0) {
+  <mat-spinner class="spinner" diameter="50"></mat-spinner>
+} @else {
+  <mat-list>
+    <mat-list-item>{{ task().title }}</mat-list-item>
+    <mat-list-item>{{ task().description }}</mat-list-item>
+    <mat-list-item>{{ task().deadline }}</mat-list-item>
+  </mat-list>
+}
