@@ -192,40 +192,40 @@ export declare const ListTasksResponseSchema: GenMessage<ListTasksResponse>;
  * @generated from service api.tasks.v1.TasksWriterService
  */
 export declare const TasksWriterService: GenService<{
-    /**
-     * CreateTask creates a Task.
-     *
-     * @generated from rpc api.tasks.v1.TasksWriterService.CreateTask
-     */
-    createTask: {
-        methodKind: "unary";
-        input: typeof CreateTaskRequestSchema;
-        output: typeof TaskSchema;
-    },
-    /**
-     * @generated from rpc api.tasks.v1.TasksWriterService.DeleteTask
-     */
-    deleteTask: {
-        methodKind: "unary";
-        input: typeof DeleteTaskRequestSchema;
-        output: typeof TaskSchema;
-    },
-    /**
-     * @generated from rpc api.tasks.v1.TasksWriterService.UndeleteTask
-     */
-    undeleteTask: {
-        methodKind: "unary";
-        input: typeof UndeleteTaskRequestSchema;
-        output: typeof TaskSchema;
-    },
-    /**
-     * @generated from rpc api.tasks.v1.TasksWriterService.UpdateTask
-     */
-    updateTask: {
-        methodKind: "unary";
-        input: typeof UpdateTaskRequestSchema;
-        output: typeof TaskSchema;
-    },
+  /**
+   * CreateTask creates a Task.
+   *
+   * @generated from rpc api.tasks.v1.TasksWriterService.CreateTask
+   */
+  createTask: {
+    methodKind: "unary";
+    input: typeof CreateTaskRequestSchema;
+    output: typeof TaskSchema;
+  },
+  /**
+   * @generated from rpc api.tasks.v1.TasksWriterService.DeleteTask
+   */
+  deleteTask: {
+    methodKind: "unary";
+    input: typeof DeleteTaskRequestSchema;
+    output: typeof TaskSchema;
+  },
+  /**
+   * @generated from rpc api.tasks.v1.TasksWriterService.UndeleteTask
+   */
+  undeleteTask: {
+    methodKind: "unary";
+    input: typeof UndeleteTaskRequestSchema;
+    output: typeof TaskSchema;
+  },
+  /**
+   * @generated from rpc api.tasks.v1.TasksWriterService.UpdateTask
+   */
+  updateTask: {
+    methodKind: "unary";
+    input: typeof UpdateTaskRequestSchema;
+    output: typeof TaskSchema;
+  },
 }>;
 
 /**
@@ -234,25 +234,25 @@ export declare const TasksWriterService: GenService<{
  * @generated from service api.tasks.v1.TasksReaderService
  */
 export declare const TasksReaderService: GenService<{
-    /**
-     * GetTask returns a Task.
-     *
-     * @generated from rpc api.tasks.v1.TasksReaderService.GetTask
-     */
-    getTask: {
-        methodKind: "unary";
-        input: typeof GetTaskRequestSchema;
-        output: typeof TaskSchema;
-    },
-    /**
-     * ListTasks returns a list of Tasks.
-     *
-     * @generated from rpc api.tasks.v1.TasksReaderService.ListTasks
-     */
-    listTasks: {
-        methodKind: "unary";
-        input: typeof ListTasksRequestSchema;
-        output: typeof ListTasksResponseSchema;
-    },
+  /**
+   * GetTask returns a Task.
+   *
+   * @generated from rpc api.tasks.v1.TasksReaderService.GetTask
+   */
+  getTask: {
+    methodKind: "unary";
+    input: typeof GetTaskRequestSchema;
+    output: typeof TaskSchema;
+  },
+  /**
+   * ListTasks returns a list of Tasks.
+   *
+   * @generated from rpc api.tasks.v1.TasksReaderService.ListTasks
+   */
+  listTasks: {
+    methodKind: "unary";
+    input: typeof ListTasksRequestSchema;
+    output: typeof ListTasksResponseSchema;
+  },
 }>;
 
