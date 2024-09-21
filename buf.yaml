@@ -1,18 +1,24 @@
-version: v1
+version: v2
 deps:
+  - buf.build/bufbuild/protovalidate
   - buf.build/googleapis/googleapis
   - buf.build/grpc-ecosystem/grpc-gateway
-  - buf.build/bufbuild/protovalidate
-breaking:
-  use:
-    - FILE
 lint:
   use:
     - DEFAULT
     - RPC_RESPONSE_STANDARD_NAME
   except:
-    - RPC_RESPONSE_STANDARD_NAME
+    - FIELD_NOT_REQUIRED
+    - PACKAGE_NO_IMPORT_CYCLE
     - RPC_REQUEST_RESPONSE_UNIQUE
+    - RPC_RESPONSE_STANDARD_NAME
   enum_zero_value_suffix: _UNSPECIFIED
   rpc_allow_google_protobuf_empty_responses: true
   service_suffix: Service
+  disallow_comment_ignores: true
+breaking:
+  use:
+    - FILE
+  except:
+    - EXTENSION_NO_DELETE
+    - FIELD_SAME_DEFAULT
