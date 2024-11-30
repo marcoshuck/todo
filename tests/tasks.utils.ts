@@ -1,5 +1,6 @@
 import {APIRequestContext, expect} from "@playwright/test";
-import {ListTasksResponse, Task} from '../api/tasks/v1/tasks_pb';
+import {ListTasksResponseSchema, Task, TaskSchema} from '../api/tasks/v1/tasks_pb';
+import {fromJsonString} from "@bufbuild/protobuf";
 
 export async function createTask(request: APIRequestContext, input: any): Promise<Task> {
     // Send the request and wait for the response.
@@ -12,7 +13,8 @@ export async function createTask(request: APIRequestContext, input: any): Promis
 
     // Read the body
     const body = await response.body();
-    return Task.fromJsonString(body.toString());
+
+    return fromJsonString(TaskSchema, body.toString());
 }
 
 export async function getTask(request: APIRequestContext, id: bigint) {
@@ -20,7 +22,7 @@ export async function getTask(request: APIRequestContext, id: bigint) {
     const body = await response.body();
     return {
         response: response,
-        data: Task.fromJsonString(body.toString()),
+        data: fromJsonString(TaskSchema, body.toString()),
     }
 }
 
@@ -35,7 +37,7 @@ export async function listTasks(request: APIRequestContext, size: number, nextPa
 
     return {
         response: response,
-        data: ListTasksResponse.fromJsonString(body.toString()),
+        data: fromJsonString(ListTasksResponseSchema, body.toString()),
     }
 }
 
@@ -59,5 +61,5 @@ export async function updateTask(request: APIRequestContext, id: bigint, payload
     });
     // Read the body
     const body = await response.body();
-    return Task.fromJsonString(body.toString());
+    return fromJsonString(TaskSchema, body.toString());
 }

@@ -327,6 +327,7 @@ func local_request_TasksReaderService_ListTasks_0(ctx context.Context, marshaler
 // UnaryRPC     :call TasksWriterServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterTasksWriterServiceHandlerFromEndpoint instead.
+// GRPC interceptors will not work for this type of registration. To use interceptors, you must use the "runtime.WithMiddlewares" option in the "runtime.NewServeMux" call.
 func RegisterTasksWriterServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server TasksWriterServiceServer) error {
 
 	mux.Handle("POST", pattern_TasksWriterService_CreateTask_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
@@ -436,6 +437,7 @@ func RegisterTasksWriterServiceHandlerServer(ctx context.Context, mux *runtime.S
 // UnaryRPC     :call TasksReaderServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterTasksReaderServiceHandlerFromEndpoint instead.
+// GRPC interceptors will not work for this type of registration. To use interceptors, you must use the "runtime.WithMiddlewares" option in the "runtime.NewServeMux" call.
 func RegisterTasksReaderServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server TasksReaderServiceServer) error {
 
 	mux.Handle("GET", pattern_TasksReaderService_GetTask_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
@@ -526,7 +528,7 @@ func RegisterTasksWriterServiceHandler(ctx context.Context, mux *runtime.ServeMu
 // to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "TasksWriterServiceClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "TasksWriterServiceClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "TasksWriterServiceClient" to call the correct interceptors.
+// "TasksWriterServiceClient" to call the correct interceptors. This client ignores the HTTP middlewares.
 func RegisterTasksWriterServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client TasksWriterServiceClient) error {
 
 	mux.Handle("POST", pattern_TasksWriterService_CreateTask_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
@@ -675,7 +677,7 @@ func RegisterTasksReaderServiceHandler(ctx context.Context, mux *runtime.ServeMu
 // to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "TasksReaderServiceClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "TasksReaderServiceClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "TasksReaderServiceClient" to call the correct interceptors.
+// "TasksReaderServiceClient" to call the correct interceptors. This client ignores the HTTP middlewares.
 func RegisterTasksReaderServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client TasksReaderServiceClient) error {
 
 	mux.Handle("GET", pattern_TasksReaderService_GetTask_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
