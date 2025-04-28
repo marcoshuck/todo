@@ -1,0 +1,44 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "server",
+    srcs = [
+        "application.go",
+        "runner.go",
+        "setup.go",
+    ],
+    importpath = "github.com/marcoshuck/todo/internal/server",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//api/tasks/v1:tasks",
+        "//internal/conf",
+        "//internal/domain",
+        "//internal/interceptors",
+        "//internal/service",
+        "//internal/telemetry",
+        "@com_github_bufbuild_protovalidate_go//:protovalidate-go",
+        "@com_github_gojaguar_jaguar//database",
+        "@com_github_prometheus_client_golang//prometheus/promhttp",
+        "@com_github_uptrace_opentelemetry_go_extra_otelgorm//:otelgorm",
+        "@io_gorm_gorm//:gorm",
+        "@io_opentelemetry_go_otel//attribute",
+        "@io_opentelemetry_go_otel_metric//:metric",
+        "@io_opentelemetry_go_otel_trace//:trace",
+        "@org_golang_google_grpc//:grpc",
+        "@org_golang_google_grpc//health",
+        "@org_golang_google_grpc//health/grpc_health_v1",
+        "@org_uber_go_multierr//:multierr",
+        "@org_uber_go_zap//:zap",
+    ],
+)
+
+go_test(
+    name = "server_test",
+    srcs = ["server_test.go"],
+    embed = [":server"],
+    deps = [
+        "//internal/conf",
+        "@com_github_gojaguar_jaguar//config",
+        "@com_github_stretchr_testify//suite",
+    ],
+)

@@ -1,0 +1,18 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "app_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/marcoshuck/todo/cmd/app",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//internal/conf",
+        "//internal/server",
+    ],
+)
+
+go_binary(
+    name = "app",
+    embed = [":app_lib"],
+    visibility = ["//visibility:public"],
+)

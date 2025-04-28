@@ -1,0 +1,22 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "conf",
+    srcs = ["config.go"],
+    importpath = "github.com/marcoshuck/todo/internal/conf",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "@com_github_caarlos0_env_v9//:env",
+        "@com_github_gojaguar_jaguar//config",
+    ],
+)
+
+go_test(
+    name = "conf_test",
+    srcs = ["config_test.go"],
+    embed = [":conf"],
+    deps = [
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//require",
+    ],
+)

@@ -1,0 +1,18 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "gateway_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/marcoshuck/todo/cmd/gateway",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//internal/conf",
+        "//internal/gateway",
+    ],
+)
+
+go_binary(
+    name = "gateway",
+    embed = [":gateway_lib"],
+    visibility = ["//visibility:public"],
+)

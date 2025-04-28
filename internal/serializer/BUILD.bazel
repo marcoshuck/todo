@@ -1,0 +1,18 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "serializer",
+    srcs = [
+        "page_token.go",
+        "serializer.go",
+    ],
+    importpath = "github.com/marcoshuck/todo/internal/serializer",
+    visibility = ["//:__subpackages__"],
+)
+
+go_test(
+    name = "serializer_test",
+    srcs = ["page_token_test.go"],
+    embed = [":serializer"],
+    deps = ["@com_github_stretchr_testify//assert"],
+)

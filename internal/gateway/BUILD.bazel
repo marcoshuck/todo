@@ -1,0 +1,27 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "gateway",
+    srcs = [
+        "gateway.go",
+        "runner.go",
+        "setup.go",
+    ],
+    importpath = "github.com/marcoshuck/todo/internal/gateway",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//api/tasks/v1:tasks",
+        "//internal/conf",
+        "//internal/interceptors",
+        "//internal/telemetry",
+        "@com_github_go_chi_chi_v5//:chi",
+        "@com_github_go_chi_chi_v5//middleware",
+        "@com_github_go_chi_cors//:cors",
+        "@com_github_grpc_ecosystem_grpc_gateway_v2//runtime",
+        "@com_github_prometheus_client_golang//prometheus/promhttp",
+        "@io_opentelemetry_go_contrib_instrumentation_google_golang_org_grpc_otelgrpc//:otelgrpc",
+        "@org_golang_google_grpc//:grpc",
+        "@org_golang_google_grpc//credentials/insecure",
+        "@org_uber_go_zap//:zap",
+    ],
+)

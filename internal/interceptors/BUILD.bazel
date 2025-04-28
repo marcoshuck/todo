@@ -1,0 +1,25 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "interceptors",
+    srcs = [
+        "client.go",
+        "common.go",
+        "server.go",
+    ],
+    importpath = "github.com/marcoshuck/todo/internal/interceptors",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/telemetry",
+        "@com_github_bufbuild_protovalidate_go//:protovalidate-go",
+        "@com_github_grpc_ecosystem_go_grpc_middleware_v2//interceptors/logging",
+        "@com_github_grpc_ecosystem_go_grpc_middleware_v2//interceptors/protovalidate",
+        "@com_github_grpc_ecosystem_go_grpc_middleware_v2//interceptors/recovery",
+        "@com_github_grpc_ecosystem_go_grpc_middleware_v2//interceptors/retry",
+        "@io_opentelemetry_go_contrib_instrumentation_google_golang_org_grpc_otelgrpc//:otelgrpc",
+        "@org_golang_google_grpc//:grpc",
+        "@org_golang_google_grpc//codes",
+        "@org_golang_google_grpc//status",
+        "@org_uber_go_zap//:zap",
+    ],
+)

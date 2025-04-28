@@ -1,0 +1,37 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "service",
+    srcs = ["tasks.go"],
+    importpath = "github.com/marcoshuck/todo/internal/service",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//api/tasks/v1:tasks",
+        "//internal/domain",
+        "//internal/serializer",
+        "@io_gorm_gorm//:gorm",
+        "@io_opentelemetry_go_otel_metric//:metric",
+        "@io_opentelemetry_go_otel_trace//:trace",
+        "@org_golang_google_grpc//codes",
+        "@org_golang_google_grpc//status",
+        "@org_uber_go_zap//:zap",
+    ],
+)
+
+go_test(
+    name = "service_test",
+    srcs = ["tasks_test.go"],
+    embed = [":service"],
+    deps = [
+        "//api/tasks/v1:tasks",
+        "//internal/domain",
+        "@com_github_stretchr_testify//suite",
+        "@io_gorm_driver_sqlite//:sqlite",
+        "@io_gorm_gorm//:gorm",
+        "@io_opentelemetry_go_otel_metric//noop",
+        "@org_golang_google_grpc//codes",
+        "@org_golang_google_grpc//status",
+        "@org_golang_google_protobuf//types/known/fieldmaskpb",
+        "@org_uber_go_zap//:zap",
+    ],
+)

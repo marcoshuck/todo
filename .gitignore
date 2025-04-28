@@ -24,6 +24,7 @@ go.work
 
 # IDEs
 .idea/
+.ijwb/
 
 # Tests
 node_modules/
@@ -31,3 +32,9 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Bazel
+bazel-bin/
+bazel-out/
+bazel-testlogs/
+bazel-todo/

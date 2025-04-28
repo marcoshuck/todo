@@ -1,0 +1,20 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "domain",
+    srcs = [
+        "migration.go",
+        "task.go",
+    ],
+    importpath = "github.com/marcoshuck/todo/internal/domain",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//api/tasks/v1:tasks",
+        "//internal/serializer",
+        "@com_github_gojaguar_jaguar//strings",
+        "@com_github_mennanov_fieldmask_utils//:fieldmask-utils",
+        "@io_gorm_gorm//:gorm",
+        "@org_golang_google_protobuf//types/known/fieldmaskpb",
+        "@org_golang_google_protobuf//types/known/timestamppb",
+    ],
+)
